@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "strictNullChecks": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "jsx": "preserve",
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "declaration": false,
+    "removeComments": true,
+    "target": "es6",
+    "lib": ["dom", "es7"],
+    "typeRoots": ["./node_modules/@types", "./src/@types"],
+    "paths": {
+      "@reco/login-m": ["./src/components/login/login/index"],
+      "@reco/login-models-m": ["./src/components/login/models/index"],
+      "@reco/login-service-m": ["./src/components/login/service/index"]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "lib",
+    "es"
+  ],
+  "awesomeTypescriptLoaderOptions": {
+    "forceIsolatedModules": true,
+    "useCache": true,
+    "usePrecompiledFiles": true
+  }
+}
