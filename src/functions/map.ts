@@ -14,6 +14,14 @@ declare namespace AMap {
         on(...args);
     }
 
+    class PlaceSearch {
+        constructor(...args);
+
+        setCity(...args);
+
+        search(...args);
+    }
+
     class service {
         constructor(...args);
     }
@@ -51,7 +59,7 @@ declare namespace AMap {
 
         NO_SUBWAY;
     }
-    
+
     class Driving {
         constructor(...args);
 

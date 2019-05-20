@@ -1,18 +1,332 @@
 import React, { Component } from 'react';
-
 import { connect } from 'dva';
-
-import NProgress from 'nprogress';
 
 import { NoticeBar, SearchBar, NavBar, Icon, InputItem, WingBlank, Button, WhiteSpace, Flex, Checkbox, TabBar, Toast, Modal, List, Badge, SegmentedControl, Accordion } from "antd-mobile";
 
 import { api_url } from "../../../functions/index";
+// import { Map } from 'react-amap';
+// import Autocomplete from 'react-amap-plugin-autocomplete';
 
-import { PylonIconType } from "../models/index";
+// import { Namespaces } from '../models/index';
+import NProgress from 'nprogress'
 
-import { Title, Tasks, Contacts, My } from './common';
+export function Title({ title }) {
+  return <>
+    <NavBar
+      mode="dark"
+      rightContent={<img src={`${api_url}/Assert/home/refresh.png`} width='22px' height='22px' onClick={() => location.reload()} />}
+      style={{ height: "7%", fontSize: "15" }}
+    >{title}</NavBar>
+  </>
+}
 
-export class HomeComponent extends Component {
+export function HomeMap() {
+  const SegmentedControlValues = ['步行', '骑行', '公交', '驾车'];
+
+  return <TabBar.Item
+    title="地图"
+    key="home"
+    icon={<div style={{
+      width: '22px',
+      height: '22px',
+      background: `url(${api_url}/Assert/home/home1.png) center center /  21px 21px no-repeat`
+    }}
+    />
+    }
+    selectedIcon={<div style={{
+      width: '22px',
+      height: '22px',
+      background: `url(${api_url}/Assert/home/home2.png) center center /  21px 21px no-repeat`
+    }}
+    />
+    }
+    selected={state!.get("tabBarChoice") === 1}
+    // badge={'new'}
+    onPress={() => dispatch({ type: "home/changeState", data: { tabBarChoice: 1 } })}
+  >
+    {!state!.get("isShowNavigationChoice") ?
+      <>
+        <Title title={"巡检地图"} />
+        <SearchBar
+          key="searchKey"
+          value={state!.get("searchKey") || ""}
+          onChange={e => {
+            dispatch({ type: "home/changeState", data: { searchKey: e } });
+          }}
+          placeholder="请输入详细地址"
+          onSubmit={e => console.log(e)}
+          style={{ width: "100%", height: "6%", padding: "0 0", fontSize: "13" }} />
+      </>
+      : <>
+        <SegmentedControl
+          style={{ height: "6%", fontSize: "15px" }}
+          selectedIndex={state!.get("selectedNavigationWay")}
+          values={SegmentedControlValues}
+          onChange={e => dispatch({
+            type: "home/changeState", data: { selectedNavigationWay: e.nativeEvent.selectedSegmentIndex }
+          })} />
+        <div style={{ width: "100%", height: "35%" }} >
+          <div id="naviPanel" style={{ width: "100%", overflowY: "auto", height: "85%" }} />
+          <div style={{ width: "100%", height: "15%" }}>
+            <Flex style={{ width: "100%", height: "100%" }}>
+              <Flex.Item style={{ width: "50%", height: "100%" }}>
+                <Button
+                  style={{ height: "100%", fontSize: "15px", lineHeight: "250%" }}
+                  onClick={() => {
+                    dispatch({
+                      type: "home/changeState", data: {
+                        isRemoveNavigation: true,
+                        isShowNavigationChoice: false,
+                        isRenderMapOnClick: 1,
+                        isFirstNavigation: true
+                      }
+                    });
+                  }}
+                >
+                  取消
+                </Button>
+              </Flex.Item>
+              <Flex.Item style={{ width: "50%", height: "100%" }}>
+                <Button
+                  type="primary"
+                  style={{ height: "100%", fontSize: "15px", lineHeight: "250%" }}
+                  onClick={() => console.log(2222)}
+                >
+                  开始导航
+                </Button>
+              </Flex.Item>
+            </Flex>
+          </div>
+        </div>
+      </>}
+    <div id="mapDiv" style={{ width: "100%", height: !state!.get("isShowNavigationChoice") ? "87%" : "59%" }} />
+  </TabBar.Item>
+}
+
+export function Tasks() {
+  return <TabBar.Item
+    title="任务"
+    key="home"
+    icon={<div style={{
+      width: '22px',
+      height: '22px',
+      background: `url(${api_url}/Assert/task/task1.png) center center /  21px 21px no-repeat`
+    }}
+    />
+    }
+    selectedIcon={<div style={{
+      width: '22px',
+      height: '22px',
+      background: `url(${api_url}/Assert/task/task2.png) center center /  21px 21px no-repeat`
+    }}
+    />
+    }
+    selected={state!.get("tabBarChoice") === 2}
+    badge={1}
+    onPress={() => dispatch({ type: "home/changeState", data: { tabBarChoice: 2 } })}
+  >
+    <Title title={"任务"} />
+    <input type={"file"} />
+  </TabBar.Item>
+}
+
+export function ContactsItemInfo({ item, i, avatar, badge }) {
+  const contactBadgeStyle = {
+    padding: '0 3px',
+    backgroundColor: '#fff',
+    borderRadius: 2,
+    color: '#f19736',
+    border: '1px solid #f19736',
+  };
+
+  return <List.Item
+    thumb={<div style={{
+      width: "50px",
+      height: "50px",
+      borderRadius: '10px',
+      background: `url(${api_url}/Assert/contact/${avatar}.png) center center /  50px 50px no-repeat`
+    }} />}
+    extra={<Badge key={i} text={badge} style={contactBadgeStyle} />}
+    multipleLine={true}
+    style={{ paddingBottom: "10px" }}
+  >
+    <div style={{ fontSize: "15px" }}>{item.Name}</div>
+    <div>
+      <a href={`tel:${item.Account}`}>
+        <img src={`${api_url}/Assert/contact/tel.png`} width="15px" height="15px" />
+      </a>
+      <a href={`smsto:${item.Account}`} style={{ marginLeft: "20px" }}>
+        <img src={`${api_url}/Assert/contact/sms.png`} width="15px" height="15px" />
+      </a>
+    </div>
+  </List.Item>
+}
+
+// 按照联系人姓名首字母排序展示
+export function SortContactsInfo({ item, i }) {
+  const contactBadgeStyle = {
+    padding: '0 3px',
+    backgroundColor: '#fff',
+    borderRadius: 2,
+    color: '#f19736',
+    border: '1px solid #f19736',
+  },
+    badge = item.Type === '0' ? '管理员' : item.Type === '1' ? '巡检人员' : item.Type === '2' ? '维修人员' : '普通用户';
+
+  return <List.Item
+    thumb={<div style={{
+      width: "50px",
+      height: "50px",
+      lineHeight: "50px",
+      textAlign: "center",
+      borderRadius: '10px',
+      backgroundColor: 'rgba(44, 183, 218, 0.664)'
+    }} >{item.firstLetter}</div>}
+    extra={<Badge key={i} text={badge} style={contactBadgeStyle} />}
+    multipleLine={true}
+    style={{ paddingBottom: "10px" }}
+  >
+    <div style={{ fontSize: "15px" }}>{item.Name}</div>
+    <div>
+      <a href={`tel:${item.Account}`}>
+        <img src={`${api_url}/Assert/contact/tel.png`} width="15px" height="15px" />
+      </a>
+      <a href={`smsto:${item.Account}`} style={{ marginLeft: "20px" }}>
+        <img src={`${api_url}/Assert/contact/sms.png`} width="15px" height="15px" />
+      </a>
+    </div>
+  </List.Item>
+}
+
+export function Contacts() {
+  const managers = state!.get("managers") || [],
+    inspectors = state!.get("inspectors") || [],
+    repairers = state!.get("repairers") || [],
+    users = state!.get("users") || [],
+    contacts = state!.get("contacts") || [];
+
+  return <TabBar.Item
+    title="联系人"
+    key="home"
+    icon={<div style={{
+      width: '22px',
+      height: '22px',
+      background: `url(${api_url}/Assert/contact/contact1.png) center center /  21px 21px no-repeat`
+    }} />}
+    selectedIcon={<div style={{
+      width: '22px',
+      height: '22px',
+      background: `url(${api_url}/Assert/contact/contact2.png) center center /  21px 21px no-repeat`
+    }} />}
+    selected={state!.get("tabBarChoice") === 3}
+    badge={1}
+    onPress={() => dispatch({ type: "home/changeState", data: { tabBarChoice: 3 } })}
+  >
+    <Title title={"联系人"} />
+    <div style={{ width: "100%", height: "93%", overflowY: "auto" }}>
+      {/* <Accordion defaultActiveKey="0" onChange={e => console.log("目前打开的有：", e)}>
+        <Accordion.Panel header="管理员">
+          <List>
+            {managers.length > 0 && managers.map((item: any, i: number) => {
+              return <ContactsItemInfo item={item} i={i} avatar={item.Sex === '0' ? 'manage_boy' : 'manage_girl'} badge={'管理员'} />;
+            })}
+          </List>
+        </Accordion.Panel>
+        <Accordion.Panel header="巡检人员">
+          <List>
+            {inspectors.length > 0 && inspectors.map((item: any, i: number) => {
+              return <ContactsItemInfo item={item} i={i} avatar={item.Sex === '0' ? 'check_boy' : 'check_girl'} badge={'巡检人员'} />;
+            })}
+          </List>
+        </Accordion.Panel>
+        <Accordion.Panel header="维修人员">
+          <List>
+            {repairers.length > 0 && repairers.map((item: any, i: number) => {
+              return <ContactsItemInfo item={item} i={i} avatar={item.Sex === '0' ? 'repair_boy' : 'repair_girl'} badge={'维修人员'} />;
+            })}
+          </List>
+        </Accordion.Panel>
+        <Accordion.Panel header="普通用户">
+          <List>
+            {users.length > 0 && users.map((item: any, i: number) => {
+              return <ContactsItemInfo item={item} i={i} avatar={item.Sex === '0' ? 'boy' : 'girl'} badge={'普通用户'} />;
+            })}
+          </List>
+        </Accordion.Panel>
+      </Accordion> */}
+      <List>
+        <List.Item
+          thumb={<div style={{
+            width: "50px",
+            height: "50px",
+            lineHeight: "50px",
+            textAlign: "center",
+            borderRadius: '10px',
+            backgroundColor: 'rgba(44, 183, 218, 0.664)'
+          }} >部</div>}
+          extra={<a>查看</a>}
+          multipleLine={true}
+          style={{ paddingBottom: "10px", paddingTop: "10px" }}
+        >
+          <div style={{ fontSize: "15px" }}>部门分组</div>
+        </List.Item>
+      </List>
+      <List>
+        {contacts.length > 0 && contacts.map((item: any, i: number) => {
+          return <SortContactsInfo item={item} i={i} />;
+        })}
+      </List>
+    </div>
+    {/* <a href={"tel:13918437134"}>打电话</a>
+    <a href={"wtai://wp//mc;13918437134"}>wtai协议打电话</a>
+    <a href={"smsto:13918437134"}>发短信</a> */}
+  </TabBar.Item >
+}
+
+export function My() {
+  return <TabBar.Item
+    title="我的"
+    key="home"
+    icon={<div style={{
+      width: '22px',
+      height: '22px',
+      background: `url(${api_url}/Assert/my/my1.png) center center /  21px 21px no-repeat`
+    }}
+    />
+    }
+    selectedIcon={<div style={{
+      width: '22px',
+      height: '22px',
+      background: `url(${api_url}/Assert/my/my2.png) center center /  21px 21px no-repeat`
+    }}
+    />
+    }
+    selected={state!.get("tabBarChoice") === 4}
+    badge={"new"}
+    onPress={() => dispatch({ type: "home/changeState", data: { tabBarChoice: 4 } })}
+  >
+    <Title title={"我的"} />
+  </TabBar.Item>
+}
+
+export function HomeComponent() {
+  // NProgress.start(); // 页面加载进度条开始
+
+  return <div style={{ position: 'fixed', height: '100%', width: '100%' }}>
+    <TabBar
+      unselectedTintColor="#949494"
+      tintColor="#33A3F4"
+      barTintColor="white"
+    >
+      {HomeMap()}
+      {Tasks()}
+      {Contacts()}
+      {My()}
+    </TabBar>
+  </div>
+}
+
+export class Home extends Component {
   constructor(props) {
     super(props);
   }
@@ -26,18 +340,12 @@ export class HomeComponent extends Component {
   transferNavigation: any; // 公交导航
   drivingNavigation: any; // 驾车导航
 
-  componentWillMount() {
-    dispatch({ type: "home/getPylons" });
-  }
-
   componentDidMount() {
     console.log(window.location.href, NProgress);
     this.renderMap();
     // NProgress.done(); // 页面加载进度条结束
-  }
-
-  componentWillUnmount() {
-    dispatch({ type: "home/changeState", data: { isRenderMapOnClick: 0, isShowNavigationChoice: false } });
+    dispatch({ type: "home/getContacts" });
+    dispatch({ type: "home/getPylons" });
   }
 
   renderMap() {
@@ -49,7 +357,7 @@ export class HomeComponent extends Component {
       // zooms: [4,18],//设置地图级别范围
       zoom: 13,
       showIndoorMap: true, // 是否在有矢量底图的时候自动展示室内地图，PC端默认是true，移动端默认是false
-      // rotateEnable: true, // 地图是否可旋转，3D视图默认为true，2D视图默认false
+      rotateEnable: true, // 地图是否可旋转，3D视图默认为true，2D视图默认false
       isHotspot: true, // 是否开启地图热点和标注的hover效果。PC端默认是true，移动端默认是false 
       showBuildingBlock: true, // 设置地图显示3D楼块效果
       buildingAnimation: true, // 楼块出现和消失的时候是否显示动画过程，3D视图有效，PC端默认true，手机端默认false
@@ -62,17 +370,31 @@ export class HomeComponent extends Component {
     this.bindClickOnMap = e => this.renderMapOnClick(e);
     dispatch({ type: "home/changeState", data: { isRenderMapOnClick: 1 } });
 
+    this.renderMapMarker();
     this.renderMapPlugin();
     this.renderMapDW();
   }
 
-  renderMapService(lng: any, lat: any) {
+  // 为地图注册click事件获取鼠标点击出的经纬度坐标和地址
+  renderMapOnClick(e: any) {
+    const lng = e.lnglat.getLng();
+    const lat = e.lnglat.getLat();
+    const lnglatXY = [lng, lat];//地图上所标点的坐标
+
+    console.log(lnglatXY)
+    this.mapOnClickMarker = new AMap.Marker({
+      offset: new AMap.Pixel(-23, -36),
+      position: lnglatXY, // 位置
+      content: `<img src="${api_url}/Assert/home/maker.png" style="width:40px;height:40px"/>`
+    });
+    this.map.add(this.mapOnClickMarker);//添加到地图
+
     new AMap.service('AMap.Geocoder', () => {
       let geocoder = new AMap.Geocoder({
         city: "", // 地理编码时，设置地址描述所在城市,可选值：城市名（中文或中文全拼）、citycode、adcode,默认值：“全国”
         extensions: "all" // 逆地理编码时，返回信息的详略,默认值：base，返回基本地址信息,取值为：all，返回地址信息及附近poi、道路、道路交叉口等信息
       });
-      geocoder.getAddress([lng, lat], (status: any, result: any) => {
+      geocoder.getAddress(lnglatXY, (status: any, result: any) => {
         if (status === 'complete' && result.info === 'OK') {
           //获得了有效的地址信息
           console.log(result)
@@ -119,25 +441,6 @@ export class HomeComponent extends Component {
     })
   }
 
-  // 为地图注册click事件获取鼠标点击出的经纬度坐标和地址
-  renderMapOnClick(e: any) {
-    const lng = e.lnglat.getLng();
-    const lat = e.lnglat.getLat();
-    const lnglatXY = [lng, lat];//地图上所标点的坐标
-
-    console.log(lnglatXY)
-    this.mapOnClickMarker = new AMap.Marker({
-      offset: new AMap.Pixel(-23, -36),
-      position: lnglatXY, // 位置
-      content: `<img src="${api_url}/Assert/home/maker.png" style="width:40px;height:40px"/>`
-    });
-    this.map.add(this.mapOnClickMarker);//添加到地图
-    
-    this.map.setCenter([lng, lat]); //设置地图中心点
-
-    this.renderMapService(lng, lat);
-  }
-
   renderMapOnClickModalContent() {
     const mapOnClickLng = state!.get("mapOnClickLng"),
       mapOnClickLat = state!.get("mapOnClickLat"),
@@ -177,7 +480,6 @@ export class HomeComponent extends Component {
         this.map.remove(this.mapOnClickMarker);
         dispatch({ type: "home/changeState", data: { isShowMapOnClickModal: false } });
       }} // 点击 x 或 mask 回调 (): void
-      style={{ maxHeight: "70%", overflowY: "auto", overflowX: "hidden" }}
     >
       <List>
         {['经纬度:', '详细地址:', '最近路口:', '最近的路:', '附近地点:'].map((item: any, index: number) => (
@@ -194,24 +496,45 @@ export class HomeComponent extends Component {
     </Modal>
   }
 
-  renderMapMarker(pylons: any) {
-    pylons && pylons.data.map(item => {
+  renderInfoWindowContent(content: string) {
+    return `<div>电塔信息</div> <div>${content}</div> <button type="primary" onClick={console.log(1111)}>去这里</button><button type="primary">发布任务</button>`
+    {/* <Button>去这里</Button><Button>发布任务</Button> */ }
+
+  }
+
+  renderMapMarker() {
+    const MarkerCoordinate = [
+      { lng: 116.365072, lat: 39.814797, msg: this.renderInfoWindowContent('二级危险，请马上维修！'), img: 'pylon_danger2' },
+      { lng: 121.372394, lat: 31.260471, msg: this.renderInfoWindowContent('最高级危险，请马上维修！'), img: 'pylon_danger3' },
+      { lng: 106.562823, lat: 26.628552, msg: this.renderInfoWindowContent('正常！'), img: 'pylon_normal' },
+      { lng: 91.138019, lat: 29.650582, msg: this.renderInfoWindowContent('正常！'), img: 'pylon_normal' },
+      { lng: 101.731283, lat: 36.710194, msg: this.renderInfoWindowContent('维修中！'), img: 'pylon_repairing' },
+      { lng: 113.508626, lat: 34.856564, msg: this.renderInfoWindowContent('巡检中！'), img: 'pylon_checking' },
+    ]
+
+    MarkerCoordinate.map(item => {
+      let infoWindow = new AMap.InfoWindow({ //创建信息窗体
+        // isCustom: true,  //使用自定义窗体
+        content: item.msg, //信息窗体的内容可以是任意html片段
+        offset: new AMap.Pixel(6, -30)
+      });
 
       let marker = new AMap.Marker({
         offset: new AMap.Pixel(-23, -36),
-        position: [item.Lng, item.Lat], // 位置
-        content: `<img src="${api_url}/Assert/home/${PylonIconType[parseInt(item.State)]}.png" style="width:46px;height:56px"/>`
+        position: [item.lng, item.lat], // 位置
+        content: `<img src="${api_url}/Assert/home/${item.img}.png" style="width:46px;height:56px"/>`
       });
 
       let onMarkerClick = e => {
         console.log(e.target.getPosition())
-        // infoWindow.open(this.map, e.target.getPosition());//打开信息窗体
+        infoWindow.open(this.map, e.target.getPosition());//打开信息窗体
         //e.target就是被点击的Marker
       }
 
       marker.on('click', onMarkerClick);//绑定click事件
       this.map.add(marker);//添加到地图
     })
+
   }
 
   // 渲染地图控件
@@ -299,9 +622,9 @@ export class HomeComponent extends Component {
       AMap.event.addListener(geolocation, 'error', onError);      // 返回定位出错信息
 
       function onComplete(data: any) {
-        Toast.success(`定位成功:${data.formattedAddress}`, 1)
+        Toast.success(`定位成功:${data.formattedAddress}`, 3)
         // data是具体的定位信息
-        // console.log(data)
+        console.log(data)
         dispatch({
           type: "home/changeState",
           data: {
@@ -478,11 +801,6 @@ export class HomeComponent extends Component {
   }
 
   render() {
-    const pylons = state!.get("pylons");
-    pylons && this.map && this.renderMapMarker(pylons);
-
-    this.map && this.renderMapAutoComplete();
-
     state!.get("isShowNavigationChoice") ? this.renderNavigation() : (this.isFirstNavigation = true);
     state!.get("isRemoveNavigation") && this.removeNavigation();
     state!.get("isRenderMapOnClick") === 1 ? this.map.on('click', this.bindClickOnMap) // 在地图上绑定点击事件
@@ -490,141 +808,9 @@ export class HomeComponent extends Component {
 
     console.log(state!.toJS())
     return <>
-      {this.renderFooter()}
+      <HomeComponent />
       {this.renderMapOnClickModalContent()}
     </>
-  }
-
-  // 地图的输入提示插件
-  renderMapAutoComplete() {
-    this.map.plugin('AMap.Autocomplete', () => {
-      // 实例化Autocomplete
-      let autoOptions = {
-        //city 限定城市，默认全国
-        city: '全国',
-        input: "searchKey"
-      }
-      let autoComplete = new AMap.Autocomplete(autoOptions);
-
-      AMap.event.addListener(autoComplete, "select", data => {
-        console.log(data);
-        const lng = data.poi.location.lng,
-          lat = data.poi.location.lat;
-
-        this.mapOnClickMarker = new AMap.Marker({ // 注册监听，当选中某条记录时会触发
-          offset: new AMap.Pixel(-23, -36),
-          position: [lng, lat], // 位置
-          content: `<img src="${api_url}/Assert/home/maker.png" style="width:40px;height:40px"/>`
-        });
-        this.map.add(this.mapOnClickMarker);// 添加到地图
-
-        this.map.setCenter([lng, lat]); //设置地图中心点
-
-        this.renderMapService(lng, lat);
-      });
-    })
-  }
-
-  renderHomeMap() {
-    const mapOnClickLng = state!.get("mapOnClickLng"),
-      mapOnClickLat = state!.get("mapOnClickLat"),
-      currentLng = state!.get("currentLng"),
-      currentLat = state!.get("currentLat"),
-      selectedNavigationWay = state!.get("selectedNavigationWay");
-
-    const SegmentedControlValues = ['步行', '骑行', '公交', '驾车'];
-
-    return <TabBar.Item
-      title="地图"
-      key="home"
-      icon={<div style={{
-        width: '22px',
-        height: '22px',
-        background: `url(${api_url}/Assert/home/home1.png) center center /  21px 21px no-repeat`
-      }} />}
-      selectedIcon={<div style={{
-        width: '22px',
-        height: '22px',
-        background: `url(${api_url}/Assert/home/home2.png) center center /  21px 21px no-repeat`
-      }} />}
-      selected={true}
-    // badge={'new'}
-    >
-      {!state!.get("isShowNavigationChoice") ?
-        <>
-          <Title title={"巡检地图"} showLoading={state!.get("showLoading")} />
-          <div style={{ width: "100%", height: "6%", padding: "3px", backgroundColor: "#efeff4" }}>
-            <input
-              name={"searchKey"}
-              id={"searchKey"}
-              placeholder="请输入详细地址"
-              style={{ width: "90%", height: "100%", fontSize: "15px", border: "0" }} />
-            <div style={{ width: "10%", height: "100%", backgroundColor: "#ffffff", float: "right", textAlign: "center", paddingTop: "1%" }}>
-              <Icon type="search" size={"md"} style={{ color: "#0a8cf7", width: "80%", height: "80%" }} />
-            </div>
-          </div>
-
-        </>
-        : <>
-          <SegmentedControl
-            style={{ height: "6%", fontSize: "15px" }}
-            selectedIndex={selectedNavigationWay}
-            values={SegmentedControlValues}
-            onChange={e => dispatch({
-              type: "home/changeState", data: { selectedNavigationWay: e.nativeEvent.selectedSegmentIndex }
-            })} />
-          <div style={{ width: "100%", height: "35%" }} >
-            <div id="naviPanel" style={{ width: "100%", overflowY: "auto", height: "85%" }} />
-            <div style={{ width: "100%", height: "15%" }}>
-              <Flex style={{ width: "100%", height: "100%" }}>
-                <Flex.Item style={{ width: selectedNavigationWay !== 2 ? "50%" : "100%", height: "100%" }}>
-                  <Button
-                    style={{ height: "100%", fontSize: "15px", lineHeight: "250%" }}
-                    onClick={() => {
-                      dispatch({
-                        type: "home/changeState", data: {
-                          isRemoveNavigation: true,
-                          isShowNavigationChoice: false,
-                          isRenderMapOnClick: 1,
-                          isFirstNavigation: true
-                        }
-                      });
-                    }}
-                  >
-                    取消
-                </Button>
-                </Flex.Item>
-                {selectedNavigationWay !== 2 && <Flex.Item style={{ width: "50%", height: "100%" }}>
-                  <a href={`navi:${selectedNavigationWay}&${currentLng}&${currentLat}&${mapOnClickLng}&${mapOnClickLat}`}>
-                    <Button
-                      type="primary"
-                      style={{ height: "100%", fontSize: "15px", lineHeight: "250%" }}
-                    >
-                      开始导航
-                    </Button>
-                  </a>
-                </Flex.Item>}
-              </Flex>
-            </div>
-          </div>
-        </>}
-      <div id="mapDiv" style={{ width: "100%", height: !state!.get("isShowNavigationChoice") ? "87%" : "59%" }} />
-    </TabBar.Item>
-  }
-
-  renderFooter() {
-    return <div style={{ position: 'fixed', height: '100%', width: '100%' }}>
-      <TabBar
-        unselectedTintColor="#949494"
-        tintColor="#33A3F4"
-        barTintColor="white"
-      >
-        {this.renderHomeMap()}
-        {Tasks()}
-        {Contacts(goTo)}
-        {My()}
-      </TabBar>
-    </div>
   }
 }
 
@@ -638,7 +824,6 @@ function mapStateToProps(state: any) {// 获取state
 let dispatch: any;
 let state: any;
 let goBack: any;
-let goTo: any;
 let isLoading: any; // 是否正在加载
 
 // export const HomePage = connect(mapStateToProps)(HomeComponent);
@@ -647,8 +832,7 @@ export const HomePage = connect(mapStateToProps)((props: any) => {
   dispatch = props.dispatch;
   state = props.home;
   goBack = props.history.goBack;
-  goTo = props.history.push;
   isLoading = props.loading.global;
   // console.log(props) // props中有match、location、home(命名空间)、history(goBack、push、go...)、dispatch
-  return <HomeComponent />
+  return <Home />
 });

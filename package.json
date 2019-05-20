@@ -16,6 +16,7 @@
     "fetch-jsonp": "^1.1.3",
     "immutable": "^4.0.0-rc.12",
     "nprogress": "^0.2.0",
+    "pinyin": "^2.9.0",
     "react": "^16.2.0",
     "react-amap": "^1.2.8",
     "react-amap-plugin-autocomplete": "^0.0.4",

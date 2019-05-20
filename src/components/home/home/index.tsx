@@ -4,11 +4,7 @@ import { HomePage, HomeComponent } from "./home";
 
 export { HomePage, HomeComponent };
 
-// export default ({ match }) => (
-//     <>
-//         <Route path={match.path} component={HomePage} />
-//     </>
-// );
+export * from './common'
 
 export function homeRoutes() {
     return (

@@ -6,6 +6,7 @@ import routers from "./router";
 
 import "./components/login/models/index"
 import "./components/home/models/index"
+import "./components/contact/models/index"
 
 
 // 1. Initialize
