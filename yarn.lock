@@ -895,6 +895,13 @@
   dependencies:
     regenerator-runtime "^0.13.2"
 
+"@babel/runtime@^7.4.2":
+  version "7.4.4"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/@babel/runtime/-/runtime-7.4.4.tgz#dc2e34982eb236803aa27a07fea6857af1b9171d"
+  integrity sha1-3C40mC6yNoA6onoH/qaFevG5Fx0=
+  dependencies:
+    regenerator-runtime "^0.13.2"
+
 "@babel/template@7.0.0-beta.44":
   version "7.0.0-beta.44"
   resolved "http://r.cnpmjs.org/@babel/template/download/@babel/template-7.0.0-beta.44.tgz#f8832f4fdcee5d59bf515e595fc5106c529b394f"
@@ -962,6 +969,28 @@
     esutils "^2.0.2"
     lodash "^4.17.11"
     to-fast-properties "^2.0.0"
+
+"@react-bootstrap/react-popper@1.2.1":
+  version "1.2.1"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/@react-bootstrap/react-popper/-/react-popper-1.2.1.tgz#4edf4851d5b4dcf2eb6b264ebbed1a7b7654177b"
+  integrity sha1-Tt9IUdW03PLrayZOu+0ae3ZUF3s=
+  dependencies:
+    babel-runtime "6.x.x"
+    create-react-context "^0.2.1"
+    popper.js "^1.14.4"
+    prop-types "^15.6.1"
+    typed-styles "^0.0.5"
+    warning "^3.0.0"
+
+"@restart/context@^2.1.4":
+  version "2.1.4"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/@restart/context/-/context-2.1.4.tgz#a99d87c299a34c28bd85bb489cb07bfd23149c02"
+  integrity sha1-qZ2HwpmjTCi9hbtInLB7/SMUnAI=
+
+"@restart/hooks@^0.2.3":
+  version "0.2.13"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/@restart/hooks/-/hooks-0.2.13.tgz#de9a2dfd6dacac3b60f9b19614cdd49f90e434c3"
+  integrity sha1-3pot/W2srDtg+bGWFM3Un5DkNMM=
 
 "@types/history@*":
   version "4.7.2"
@@ -1876,7 +1905,7 @@ babel-register@^6.26.0:
     mkdirp "^0.5.1"
     source-map-support "^0.4.15"
 
-babel-runtime@6.x, babel-runtime@^6.22.0, babel-runtime@^6.23.0, babel-runtime@^6.26.0, babel-runtime@^6.9.2:
+babel-runtime@6.x, babel-runtime@6.x.x, babel-runtime@^6.22.0, babel-runtime@^6.23.0, babel-runtime@^6.26.0, babel-runtime@^6.9.2:
   version "6.26.0"
   resolved "http://r.cnpmjs.org/babel-runtime/download/babel-runtime-6.26.0.tgz#965c7058668e82b55d7bfe04ff2337bc8b5647fe"
   integrity sha1-llxwWGaOgrVde/4E/yM3vItWR/4=
@@ -2980,6 +3009,22 @@ create-react-class@^15.6.0:
     loose-envify "^1.3.1"
     object-assign "^4.1.1"
 
+create-react-context@<=0.2.2:
+  version "0.2.2"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/create-react-context/-/create-react-context-0.2.2.tgz#9836542f9aaa22868cd7d4a6f82667df38019dca"
+  integrity sha1-mDZUL5qqIoaM19Sm+CZn3zgBnco=
+  dependencies:
+    fbjs "^0.8.0"
+    gud "^1.0.0"
+
+create-react-context@^0.2.1:
+  version "0.2.3"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/create-react-context/-/create-react-context-0.2.3.tgz#9ec140a6914a22ef04b8b09b7771de89567cb6f3"
+  integrity sha1-nsFAppFKIu8EuLCbd3HeiVZ8tvM=
+  dependencies:
+    fbjs "^0.8.0"
+    gud "^1.0.0"
+
 cross-spawn@5.1.0, cross-spawn@^5.0.1, cross-spawn@^5.1.0:
   version "5.1.0"
   resolved "http://r.cnpmjs.org/cross-spawn/download/cross-spawn-5.1.0.tgz#e8bd0efee58fcff6f8f94510a0a554bbfa235449"
@@ -3440,6 +3485,13 @@ dom-converter@^0.2:
   integrity sha1-ZyGp2u4uKTaClVtq/kFncWJ7t2g=
   dependencies:
     utila "~0.4"
+
+dom-helpers@^3.4.0:
+  version "3.4.0"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/dom-helpers/-/dom-helpers-3.4.0.tgz#e9b369700f959f62ecde5a6babde4bccd9169af8"
+  integrity sha1-6bNpcA+Vn2Ls3lprq95LzNkWmvg=
+  dependencies:
+    "@babel/runtime" "^7.1.2"
 
 dom-serializer@0, dom-serializer@~0.1.1:
   version "0.1.1"
@@ -4329,7 +4381,7 @@ fb-watchman@^2.0.0:
   dependencies:
     bser "^2.0.0"
 
-fbjs@^0.8.3, fbjs@^0.8.9:
+fbjs@^0.8.0, fbjs@^0.8.3, fbjs@^0.8.9:
   version "0.8.17"
   resolved "http://r.cnpmjs.org/fbjs/download/fbjs-0.8.17.tgz#c4d598ead6949112653d6588b01a5cdcd9f90fdd"
   integrity sha1-xNWY6taUkRJlPWWIsBpc3Nn5D90=
@@ -4874,6 +4926,11 @@ growly@^1.3.0:
   version "1.3.0"
   resolved "http://r.cnpmjs.org/growly/download/growly-1.3.0.tgz#f10748cbe76af964b7c96c93c6bcc28af120c081"
   integrity sha1-8QdIy+dq+WS3yWyTxrzCivEgwIE=
+
+gud@^1.0.0:
+  version "1.0.0"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/gud/-/gud-1.0.0.tgz#a489581b17e6a70beca9abe3ae57de7a499852c0"
+  integrity sha1-pIlYGxfmpwvsqavjrlfeekmYUsA=
 
 gzip-size@3.0.0:
   version "3.0.0"
@@ -6399,6 +6456,11 @@ jsx-ast-utils@^2.0.1:
   dependencies:
     array-includes "^3.0.3"
 
+keycode@^2.2.0:
+  version "2.2.0"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/keycode/-/keycode-2.2.0.tgz#3d0af56dc7b8b8e5cba8d0a97f107204eec22b04"
+  integrity sha1-PQr1bce4uOXLqNCpfxByBO7CKwQ=
+
 keypress@0.1.x:
   version "0.1.0"
   resolved "http://r.cnpmjs.org/keypress/download/keypress-0.1.0.tgz#4a3188d4291b66b4f65edb99f806aa9ae293592a"
@@ -7901,6 +7963,11 @@ pn@^1.1.0:
   resolved "http://r.cnpmjs.org/pn/download/pn-1.1.0.tgz#e2f4cef0e219f463c179ab37463e4e1ecdccbafb"
   integrity sha1-4vTO8OIZ9GPBeas3Rj5OHs3Muvs=
 
+popper.js@^1.14.4, popper.js@^1.14.7:
+  version "1.15.0"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/popper.js/-/popper.js-1.15.0.tgz#5560b99bbad7647e9faa475c6b8056621f5a4ff2"
+  integrity sha1-VWC5m7rXZH6fqkdca4BWYh9aT/I=
+
 portfinder@^1.0.9:
   version "1.0.20"
   resolved "http://r.cnpmjs.org/portfinder/download/portfinder-1.0.20.tgz#bea68632e54b2e13ab7b0c4775e9b41bf270e44a"
@@ -8315,6 +8382,14 @@ prop-types-exact@^1.2.0:
     object.assign "^4.1.0"
     reflect.ownkeys "^0.2.0"
 
+prop-types-extra@^1.1.0:
+  version "1.1.0"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/prop-types-extra/-/prop-types-extra-1.1.0.tgz#32609910ea2dcf190366bacd3490d5a6412a605f"
+  integrity sha1-MmCZEOotzxkDZrrNNJDVpkEqYF8=
+  dependencies:
+    react-is "^16.3.2"
+    warning "^3.0.0"
+
 prop-types@15.x, prop-types@^15.5.10, prop-types@^15.5.4, prop-types@^15.5.6, prop-types@^15.5.8, prop-types@^15.6.0, prop-types@^15.6.1, prop-types@^15.6.2, prop-types@^15.7.2:
   version "15.7.2"
   resolved "http://r.cnpmjs.org/prop-types/download/prop-types-15.7.2.tgz#52c41e75b8c87e72b9d9360e0206b99dcbffa6c5"
@@ -8616,6 +8691,32 @@ react-amap@^1.2.8:
   resolved "http://r.cnpmjs.org/react-amap/download/react-amap-1.2.8.tgz#cb5a6441c5e83acb0d7b2e8a1b20dc539b759d9b"
   integrity sha1-y1pkQcXoOssNey6KGyDcU5t1nZs=
 
+react-bootstrap@^1.0.0-beta.8:
+  version "1.0.0-beta.8"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/react-bootstrap/-/react-bootstrap-1.0.0-beta.8.tgz#88d545526abe61c591d4eb84abad82e7f432c111"
+  integrity sha1-iNVFUmq+YcWR1OuEq62C5/QywRE=
+  dependencies:
+    "@babel/runtime" "^7.4.2"
+    "@react-bootstrap/react-popper" "1.2.1"
+    "@restart/context" "^2.1.4"
+    "@restart/hooks" "^0.2.3"
+    classnames "^2.2.6"
+    dom-helpers "^3.4.0"
+    invariant "^2.2.4"
+    keycode "^2.2.0"
+    popper.js "^1.14.7"
+    prop-types "^15.7.2"
+    prop-types-extra "^1.1.0"
+    react-overlays "^1.2.0"
+    react-transition-group "^2.7.1"
+    uncontrollable "^6.1.0"
+    warning "^4.0.3"
+
+react-context-toolbox@^2.0.2:
+  version "2.0.2"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/react-context-toolbox/-/react-context-toolbox-2.0.2.tgz#35637287cb23f801e6ed802c2bb7a97e1f04e3fb"
+  integrity sha1-NWNyh8sj+AHm7YAsK7epfh8E4/s=
+
 react-dev-utils@^5.0.0:
   version "5.0.3"
   resolved "http://r.cnpmjs.org/react-dev-utils/download/react-dev-utils-5.0.3.tgz#92f97668f03deb09d7fa11ea288832a8c756e35e"
@@ -8660,7 +8761,7 @@ react-error-overlay@^4.0.1:
   resolved "http://r.cnpmjs.org/react-error-overlay/download/react-error-overlay-4.0.1.tgz#417addb0814a90f3a7082eacba7cee588d00da89"
   integrity sha1-QXrdsIFKkPOnCC6sunzuWI0A2ok=
 
-react-is@^16.8.1, react-is@^16.8.6:
+react-is@^16.3.2, react-is@^16.8.1, react-is@^16.8.6:
   version "16.8.6"
   resolved "http://r.cnpmjs.org/react-is/download/react-is-16.8.6.tgz#5bbc1e2d29141c9fbdfed456343fe2bc430a6a16"
   integrity sha1-W7weLSkUHJ+9/tRWND/ivEMKahY=
@@ -8678,6 +8779,32 @@ react-native-swipeout@^2.2.2:
     create-react-class "^15.6.0"
     prop-types "^15.5.10"
     react-tween-state "^0.1.5"
+
+react-overlays@^1.2.0:
+  version "1.2.0"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/react-overlays/-/react-overlays-1.2.0.tgz#205368eeb0a5fb0b7f9b717fa7a12d518500abdb"
+  integrity sha1-IFNo7rCl+wt/m3F/p6EtUYUAq9s=
+  dependencies:
+    classnames "^2.2.6"
+    dom-helpers "^3.4.0"
+    prop-types "^15.6.2"
+    prop-types-extra "^1.1.0"
+    react-context-toolbox "^2.0.2"
+    react-popper "^1.3.2"
+    uncontrollable "^6.0.0"
+    warning "^4.0.2"
+
+react-popper@^1.3.2:
+  version "1.3.3"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/react-popper/-/react-popper-1.3.3.tgz#2c6cef7515a991256b4f0536cd4bdcb58a7b6af6"
+  integrity sha1-LGzvdRWpkSVrTwU2zUvctYp7avY=
+  dependencies:
+    "@babel/runtime" "^7.1.2"
+    create-react-context "<=0.2.2"
+    popper.js "^1.14.4"
+    prop-types "^15.6.1"
+    typed-styles "^0.0.7"
+    warning "^4.0.2"
 
 react-redux@5.0.7:
   version "5.0.7"
@@ -8734,6 +8861,16 @@ react-test-renderer@^16.0.0-0:
     prop-types "^15.6.2"
     react-is "^16.8.6"
     scheduler "^0.13.6"
+
+react-transition-group@^2.7.1:
+  version "2.9.0"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/react-transition-group/-/react-transition-group-2.9.0.tgz#df9cdb025796211151a436c69a8f3b97b5b07c8d"
+  integrity sha1-35zbAleWIRFRpDbGmo87l7WwfI0=
+  dependencies:
+    dom-helpers "^3.4.0"
+    loose-envify "^1.4.0"
+    prop-types "^15.6.2"
+    react-lifecycles-compat "^3.0.4"
 
 react-tween-state@^0.1.5:
   version "0.1.5"
@@ -10575,6 +10712,16 @@ type-is@~1.6.16:
     media-typer "0.3.0"
     mime-types "~2.1.18"
 
+typed-styles@^0.0.5:
+  version "0.0.5"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/typed-styles/-/typed-styles-0.0.5.tgz#a60df245d482a9b1adf9c06c078d0f06085ed1cf"
+  integrity sha1-pg3yRdSCqbGt+cBsB40PBghe0c8=
+
+typed-styles@^0.0.7:
+  version "0.0.7"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/typed-styles/-/typed-styles-0.0.7.tgz#93392a008794c4595119ff62dde6809dbc40a3d9"
+  integrity sha1-kzkqAIeUxFlRGf9i3eaAnbxAo9k=
+
 typedarray@^0.0.6:
   version "0.0.6"
   resolved "http://r.cnpmjs.org/typedarray/download/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
@@ -10667,6 +10814,13 @@ umi-test@^0.6.0-beta.1:
     react-dom "^16.3.0"
     ts-jest-babel-7 "^22.0.6"
     typescript "^2.8.1"
+
+uncontrollable@^6.0.0, uncontrollable@^6.1.0:
+  version "6.1.0"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/uncontrollable/-/uncontrollable-6.1.0.tgz#45dcf54b76bf07e0ddf7c1a669caf935d2e101d5"
+  integrity sha1-Rdz1S3a/B+Dd98Gmacr5NdLhAdU=
+  dependencies:
+    invariant "^2.2.4"
 
 unicode-canonical-property-names-ecmascript@^1.0.4:
   version "1.0.4"
@@ -10944,7 +11098,7 @@ warning@^3.0.0:
   dependencies:
     loose-envify "^1.0.0"
 
-warning@^4.0.1:
+warning@^4.0.1, warning@^4.0.2, warning@^4.0.3:
   version "4.0.3"
   resolved "http://r.cnpmjs.org/warning/download/warning-4.0.3.tgz#16e9e077eb8a86d6af7d64aa1e05fd85b4678ca3"
   integrity sha1-Fungd+uKhtavfWSqHgX9hbRnjKM=
