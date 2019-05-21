@@ -3,6 +3,8 @@ import { connect } from 'dva';
 
 import { TabBar, List, NavBar, Icon } from "antd-mobile";
 
+import { Alert } from "react-bootstrap";
+
 import { api_url } from "../../../functions/index";
 
 import { Tasks, HomeMap, My } from '../../home/home/index';
@@ -65,6 +67,9 @@ export class ContactComponent extends Component {
           })}
         </List>
       </div>
+      <Alert key={1} variant={"primary"}>
+        This is a primary alert—check it out!
+      </Alert>
     </TabBar.Item >
   }
 
