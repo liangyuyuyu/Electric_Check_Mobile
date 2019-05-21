@@ -31,7 +31,8 @@ app.model({
     walkingNavigationStepsCount: 0, // 步行导航的步骤数
     isRemoveNavigation: false, // 是否移出导航，退出导航选择界面时为true
     isRenderMapOnClick: 0, // 地图是否可以点击, 0:地图未渲染，1:给地图绑定点击事件，2:解绑地图上的点击事件
-    pylons: null
+    pylons: null,
+    isRenderPylonsMaker: true // 是否渲染地图上电塔的标记，第一次渲染完电塔maker以后，赋值为false，避免重复渲染maker
   }),
 
 

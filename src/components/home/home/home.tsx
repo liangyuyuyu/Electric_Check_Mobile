@@ -132,7 +132,7 @@ export class HomeComponent extends Component {
       content: `<img src="${api_url}/Assert/home/maker.png" style="width:40px;height:40px"/>`
     });
     this.map.add(this.mapOnClickMarker);//添加到地图
-    
+
     this.map.setCenter([lng, lat]); //设置地图中心点
 
     this.renderMapService(lng, lat);
@@ -194,7 +194,7 @@ export class HomeComponent extends Component {
     </Modal>
   }
 
-  renderMapMarker(pylons: any) {
+  renderMapPylonsMarker(pylons: any) {
     pylons && pylons.data.map(item => {
 
       let marker = new AMap.Marker({
@@ -211,6 +211,8 @@ export class HomeComponent extends Component {
 
       marker.on('click', onMarkerClick);//绑定click事件
       this.map.add(marker);//添加到地图
+
+      dispatch({ type: "home/changeState", data: { isRenderPylonsMaker: false } });
     })
   }
 
@@ -479,7 +481,7 @@ export class HomeComponent extends Component {
 
   render() {
     const pylons = state!.get("pylons");
-    pylons && this.map && this.renderMapMarker(pylons);
+    state!.get("isRenderPylonsMaker") && pylons && this.map && this.renderMapPylonsMarker(pylons);
 
     this.map && this.renderMapAutoComplete();
 
