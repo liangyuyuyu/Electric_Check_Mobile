@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 
-import { TabBar, List, NavBar, Icon } from "antd-mobile";
+import { Link } from 'dva/router';
 
-import { Alert } from "react-bootstrap";
+import { TabBar, List, NavBar, Icon } from "antd-mobile";
 
 import { api_url } from "../../../functions/index";
 
@@ -25,7 +25,7 @@ export class ContactComponent extends Component {
       <NavBar
         rightContent={<img src={`${api_url}/Assert/home/refresh.png`} width='22px' height='22px' onClick={() => location.reload()} />}
         style={{ height: "7%", fontSize: "15" }}
-      >联系人 {state!.get("showLoading") ? <Icon type={"loading"} size="xs"/> : <></>}</NavBar>
+      >联系人 {state!.get("showLoading") ? <Icon type={"loading"} size="xs" /> : <></>}</NavBar>
     </>
   }
 
@@ -51,15 +51,17 @@ export class ContactComponent extends Component {
       {this.renderTitle()}
       <div style={{ width: "100%", height: "93%", overflowY: "auto" }}>
         <List>
-          <List.Item
-            thumb={<div style={groupingAvatarStyle} >组</div>}
-            extra={<a style={{ fontSize: "15px" }}>查看</a>}
-            multipleLine={true}
-            style={{ paddingBottom: "10px", paddingTop: "10px" }}
-            onClick={() => goTo('contact/contactGrouping')}
-          >
-            <div style={{ fontSize: "15px" }}>联系人分组</div>
-          </List.Item>
+          <Link to={"/contact/contactGrouping"}>
+            <List.Item
+              thumb={<div style={{ color: "black", ...groupingAvatarStyle }} >组</div>}
+              extra={<a style={{ fontSize: "15px" }}>查看</a>}
+              multipleLine={true}
+              style={{ paddingBottom: "10px", paddingTop: "10px" }}
+            // onClick={() => goTo('contact/contactGrouping')}
+            >
+              <div style={{ fontSize: "15px" }}>联系人分组</div>
+            </List.Item>
+          </Link>
         </List>
         <List>
           {contacts.length > 0 && contacts.map((item: any, i: number) => {
@@ -67,9 +69,6 @@ export class ContactComponent extends Component {
           })}
         </List>
       </div>
-      <Alert key={1} variant={"primary"}>
-        This is a primary alert—check it out!
-      </Alert>
     </TabBar.Item >
   }
 

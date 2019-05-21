@@ -23,14 +23,14 @@ app.model({
 
 
   effects: {
+
     // 获取所有的联系人
-    *getContacts({ fail }, { call, put, select }) {
+    *getContacts({ fail }, { call, put }) {
       try {
         yield put({ type: "changeState", data: { showLoading: true } });
 
         const contacts = yield call(UsersGetService);
 
-        let managers: any = [], inspectors: any = [], repairers: any = [], users: any = [];
         if (contacts) {
           contacts.data.map((item: any, i: number) => {
             contacts.data[i] = {
@@ -40,7 +40,33 @@ app.model({
               })[0][0].toUpperCase(),
               ...item
             }
+          })
+        }
 
+        yield put({
+          type: "changeState",
+          data: {
+            contacts: contactsBubbleSort(contacts.data), // 按照联系人姓名的首字母进行排序
+          }
+        });
+
+      } catch (error) {
+        fail!(error.errmsg);
+      } finally {
+        yield put({ type: "changeState", data: { showLoading: false } });
+      }
+    },
+
+    // 获取所有的联系人并分组
+    *getContactsGrouping({ fail }, { call, put }) {
+      try {
+        yield put({ type: "changeState", data: { showLoading: true } });
+
+        const contacts = yield call(UsersGetService);
+
+        let managers: any = [], inspectors: any = [], repairers: any = [], users: any = [];
+        if (contacts) {
+          contacts.data.map((item: any) => {
             if (item.Type === "0") managers.push(item); // 管理人员
             else if (item.Type === "1") inspectors.push(item); // 巡检人员
             else if (item.Type === "2") repairers.push(item); // 维修人员
@@ -51,7 +77,6 @@ app.model({
         yield put({
           type: "changeState",
           data: {
-            contacts: contactsBubbleSort(contacts.data), // 按照联系人姓名的首字母进行排序
             managers: managers,
             inspectors: inspectors,
             repairers: repairers,
@@ -69,8 +94,6 @@ app.model({
 
   reducers: {
     changeState(state, { data }) {
-
-      console.log(data)
       return state.merge(data);
     }
   }

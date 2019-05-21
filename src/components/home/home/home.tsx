@@ -6,6 +6,8 @@ import NProgress from 'nprogress';
 
 import { NoticeBar, SearchBar, NavBar, Icon, InputItem, WingBlank, Button, WhiteSpace, Flex, Checkbox, TabBar, Toast, Modal, List, Badge, SegmentedControl, Accordion } from "antd-mobile";
 
+import { Modal as BTModal, Button as BTButton } from "react-bootstrap";
+
 import { api_url } from "../../../functions/index";
 
 import { PylonIconType } from "../models/index";
@@ -17,6 +19,7 @@ export class HomeComponent extends Component {
     super(props);
   }
 
+  isFirstDW = true; // 是否是第一次定位
   map: any;
   bindClickOnMap: any; // 点击事件绑定到地图上
   mapOnClickMarker: any;
@@ -37,7 +40,16 @@ export class HomeComponent extends Component {
   }
 
   componentWillUnmount() {
-    dispatch({ type: "home/changeState", data: { isRenderMapOnClick: 0, isShowNavigationChoice: false } });
+    dispatch({
+      type: "home/changeState",
+      data: {
+        isRenderMapOnClick: 0,
+        isShowNavigationChoice: false,
+        isRenderPylonsMaker: true
+      }
+    });
+
+    Toast.hide(); // 全局配置和全局销毁Toast的方法
   }
 
   renderMap() {
@@ -66,22 +78,35 @@ export class HomeComponent extends Component {
     this.renderMapDW();
   }
 
+  // 根据经纬度搜索地点及周边信息
   renderMapService(lng: any, lat: any) {
     new AMap.service('AMap.Geocoder', () => {
       let geocoder = new AMap.Geocoder({
-        city: "", // 地理编码时，设置地址描述所在城市,可选值：城市名（中文或中文全拼）、citycode、adcode,默认值：“全国”
+        city: "全国", // 地理编码时，设置地址描述所在城市,可选值：城市名（中文或中文全拼）、citycode、adcode,默认值：“全国”
         extensions: "all" // 逆地理编码时，返回信息的详略,默认值：base，返回基本地址信息,取值为：all，返回地址信息及附近poi、道路、道路交叉口等信息
       });
       geocoder.getAddress([lng, lat], (status: any, result: any) => {
         if (status === 'complete' && result.info === 'OK') {
           //获得了有效的地址信息
-          console.log(result)
 
           const regeocode = result.regeocode,
             formattedAddress = regeocode.formattedAddress,
-            { first_name, second_name, direction, distance } = regeocode.crosses[0],
-            nearestRoad = regeocode.roads[0],
             pois = regeocode.pois;
+
+          let first_name = "",
+            second_name = "",
+            direction = "",
+            distance = "";
+          if (regeocode.crosses.length > 0) { // 避免出现十字路口数据为空的情况
+            first_name = regeocode.crosses[0].first_name;
+            second_name = regeocode.crosses[0].second_name;
+            direction = regeocode.crosses[0].direction;
+            distance = regeocode.crosses[0].distance;
+          }
+
+          let nearestRoad: any;
+          if (regeocode.roads.length > 0)
+            nearestRoad = regeocode.roads[0];
 
           let nearestPois: any = [];
           for (let i in pois) {
@@ -105,15 +130,17 @@ export class HomeComponent extends Component {
               mapOnClickLng: lng,
               mapOnClickLat: lat,
               mapOnClickAddress: formattedAddress,
-              mapOnClickCrosses: `${first_name}与${second_name}交叉口，位于所点位置的${direction}方向${distance}米处`,
-              mapOnClickRoad: `${nearestRoad.name}，位于所点位置的${nearestRoad.direction}方向${nearestRoad.distance}米处`,
+              mapOnClickCrosses: first_name ? `${first_name}与${second_name}交叉口，位于所点位置的${direction}方向${distance}米处` : "",
+              mapOnClickRoad: nearestRoad ? `${nearestRoad.name}，位于所点位置的${nearestRoad.direction}方向${nearestRoad.distance}米处` : null,
               mapOnClickPois: nearestPois
             }
           });
         }
         else {
           //获取地址失败
-          Toast.fail("获取地址失败", 2);
+          Toast.fail("获取地址失败, 请在中国范围内选择地址", 2);
+
+          this.mapOnClickMarker && this.map.remove(this.mapOnClickMarker);
         }
       });
     })
@@ -125,7 +152,6 @@ export class HomeComponent extends Component {
     const lat = e.lnglat.getLat();
     const lnglatXY = [lng, lat];//地图上所标点的坐标
 
-    console.log(lnglatXY)
     this.mapOnClickMarker = new AMap.Marker({
       offset: new AMap.Pixel(-23, -36),
       position: lnglatXY, // 位置
@@ -147,9 +173,23 @@ export class HomeComponent extends Component {
       mapOnClickAddress = state!.get("mapOnClickAddress"),
       mapOnClickCrosses = state!.get("mapOnClickCrosses"),
       mapOnClickRoad = state!.get("mapOnClickRoad"),
-      mapOnClickPois = state!.get("mapOnClickPois"),
+      mapOnClickPois = state!.get("mapOnClickPois") || [],
       isShowMapOnClickModal = state!.get("isShowMapOnClickModal"),
-      valueArray = [`${mapOnClickLng},${mapOnClickLat}`, mapOnClickAddress, mapOnClickCrosses, mapOnClickRoad, mapOnClickPois];
+      valueArray = [`${mapOnClickLng},${mapOnClickLat}`, mapOnClickAddress],
+      keyArray: any = ['经纬度:', '详细地址:']; // mapOnClickCrosses, mapOnClickRoad, mapOnClickPois];
+
+    if (mapOnClickCrosses) {
+      valueArray.push(mapOnClickCrosses)
+      keyArray.push('最近路口:')
+    }
+    if (mapOnClickRoad) {
+      valueArray.push(mapOnClickRoad)
+      keyArray.push('最近的路:')
+    }
+    if (mapOnClickPois.length > 0) {
+      valueArray.push(mapOnClickPois)
+      keyArray.push('附近地点:')
+    }
 
     return <Modal
       popup // 是否弹窗模式
@@ -161,8 +201,19 @@ export class HomeComponent extends Component {
       footer={[
         {
           text: '取消', onPress: () => {
-            this.map.remove(this.mapOnClickMarker);
-            dispatch({ type: "home/changeState", data: { isShowMapOnClickModal: false } });
+            this.mapOnClickMarker && this.map.remove(this.mapOnClickMarker);
+            dispatch({
+              type: "home/changeState",
+              data: {
+                isShowMapOnClickModal: false,
+                mapOnClickLng: 0, // 点击地图上某个点，该点的经度
+                mapOnClickLat: 0, // 点击地图上某个点，该点的纬度
+                mapOnClickAddress: '', // 点击地图上某个点，该点的地址
+                mapOnClickCrosses: '', // 点击地图上某个点，该点的最近的路口
+                mapOnClickRoad: '', // 点击地图上某个点，该点的最近的路
+                mapOnClickPois: null, // 点击地图上某个点，该点的附近地点 } });
+              }
+            });
           }
         },
         {
@@ -174,13 +225,13 @@ export class HomeComponent extends Component {
         }
       ]} // 底部内容  Array {text, onPress}
       onClose={() => {
-        this.map.remove(this.mapOnClickMarker);
+        this.mapOnClickMarker && this.map.remove(this.mapOnClickMarker);
         dispatch({ type: "home/changeState", data: { isShowMapOnClickModal: false } });
       }} // 点击 x 或 mask 回调 (): void
       style={{ maxHeight: "70%", overflowY: "auto", overflowX: "hidden" }}
     >
       <List>
-        {['经纬度:', '详细地址:', '最近路口:', '最近的路:', '附近地点:'].map((item: any, index: number) => (
+        {keyArray.map((item: any, index: number) => (
           <List.Item wrap={true} key={index}>
             <table style={{ width: "100%" }}>
               <tr>
@@ -194,8 +245,51 @@ export class HomeComponent extends Component {
     </Modal>
   }
 
+  // 地图电塔被点击时触发
+  renderPylonMakerOnClick() {
+    const lng = state!.get("currentOnClickPylonLng"),
+      lat = state!.get("currentOnClickPylonLat");
+
+    let isFirstComeIn = true;
+
+    return <BTModal
+      show={state!.get("isShowPylonModal")}
+      onHide={() => {
+        !isFirstComeIn && dispatch({ type: "home/changeState", data: { isShowPylonModal: false } });
+        isFirstComeIn = false;
+      }}
+      size="xl"
+      aria-labelledby="contained-modal-title-vcenter"
+      centered
+    >
+      <BTModal.Header closeButton>
+        <BTModal.Title id="contained-modal-title-vcenter">
+          <span style={{ fontSize: "15px" }}>操作提示</span>
+        </BTModal.Title>
+      </BTModal.Header>
+      <BTModal.Footer>
+        <BTButton variant="outline-primary"
+          onClick={() => {
+            dispatch({ type: "home/changeState", data: { isShowPylonModal: false } });
+            this.renderMapService(lng, lat);
+          }}
+          style={{ width: "33%", fontSize: "15px" }}>电塔周边</BTButton>
+        <BTButton variant="outline-info"
+          onClick={() => dispatch({ type: "home/changeState", data: { isShowPylonModal: false } })}
+          style={{ width: "33%", fontSize: "15px" }}>电塔信息</BTButton>
+        <BTButton variant="outline-success"
+          onClick={() => dispatch({
+            type: "home/changeState", data: {
+              isShowPylonModal: false, isShowNavigationChoice: true, isRenderMapOnClick: 2, mapOnClickLng: lng, mapOnClickLat: lat
+            }
+          })}
+          style={{ width: "33%", fontSize: "15px" }}>去这里</BTButton>
+      </BTModal.Footer>
+    </BTModal>
+  }
+
   renderMapPylonsMarker(pylons: any) {
-    pylons && pylons.data.map(item => {
+    pylons && pylons.data.map((item: any, i: number) => {
 
       let marker = new AMap.Marker({
         offset: new AMap.Pixel(-23, -36),
@@ -204,9 +298,18 @@ export class HomeComponent extends Component {
       });
 
       let onMarkerClick = e => {
-        console.log(e.target.getPosition())
-        // infoWindow.open(this.map, e.target.getPosition());//打开信息窗体
-        //e.target就是被点击的Marker
+        const lnglat = e.target.getPosition();
+        console.log(lnglat);
+        // this.renderMapService(lnglat.lng, lnglat.lat)
+        dispatch({
+          type: "home/changeState",
+          data: {
+            isShowPylonModal: true,
+            currentOnClickPylonLng: lnglat.lng, // 当前被点击电塔的经度
+            currentOnClickPylonLat: lnglat.lat, // 当前被点击电塔的纬度
+            currentOnClickPylonIndex: i // 当前被点击电塔在电塔数组的下标
+          }
+        })
       }
 
       marker.on('click', onMarkerClick);//绑定click事件
@@ -262,7 +365,7 @@ export class HomeComponent extends Component {
       let geolocation = new AMap.Geolocation({
         enableHighAccuracy: true, // 是否使用高精度定位，默认:true
         GeoLocationFirst: true, // 默认为false，设置为true的时候可以调整PC端为优先使用浏览器定位，失败后使用IP定位
-        timeout: 10000,          // 超过10秒后停止定位，默认：无穷大
+        timeout: 30000,          // 超过30秒后停止定位，默认：无穷大
         maximumAge: 0,           // 定位结果缓存0毫秒，默认：0
         convert: true,           // 自动偏移坐标，偏移后的坐标为高德坐标，默认：true
         showButton: true,        // 显示定位按钮，默认：true
@@ -282,7 +385,7 @@ export class HomeComponent extends Component {
           fillColor: '#1791fc',   // 圆形填充颜色
           strokeColor: '#FF33FF', // 描边颜色
           strokeWeight: 6, // 描边宽度
-          borderWeight: 3,
+          borderWeight: 2,
           strokeOpacity: 0.2,
           fillOpacity: 0.4,
           strokeStyle: 'dashed',
@@ -301,7 +404,7 @@ export class HomeComponent extends Component {
       AMap.event.addListener(geolocation, 'error', onError);      // 返回定位出错信息
 
       function onComplete(data: any) {
-        Toast.success(`定位成功:${data.formattedAddress}`, 1)
+        Toast.success(`当前位置:${data.formattedAddress}`, 1)
         // data是具体的定位信息
         // console.log(data)
         dispatch({
@@ -316,8 +419,7 @@ export class HomeComponent extends Component {
 
       function onError(data: any) {
         // 定位出错
-        console.log(data)
-        Toast.success(`定位失败`, 1)
+        Toast.fail(`定位失败`, 1)
       }
     })
   }
@@ -325,6 +427,7 @@ export class HomeComponent extends Component {
 
   // 步行导航
   renderWalkingNavigation() {
+    Toast.loading("步行路线规划中...");
     this.map.plugin('AMap.Walking', () => {
       this.walkingNavigation = new AMap.Walking({
         map: this.map,
@@ -337,16 +440,19 @@ export class HomeComponent extends Component {
       //根据起终点坐标规划步行路线
       this.walkingNavigation.search([state!.get("currentLng"), state!.get("currentLat")], [state!.get("mapOnClickLng"), state!.get("mapOnClickLat")], (status: any, result: any) => {
         // result即是对应的步行路线数据信息
+        Toast.hide();
         if (status === 'complete') {
-          console.log(result)
+          // console.log(result)
           // dispatch({ type: "home/changeState",
           //   data: {
           //     walkingNavigationStepsCount: result.routes[0].steps.length
           //   }
           // });
-          Toast.success('绘制步行路线完成', 2);
+          Toast.success('步行路线规划成功', 1);
         } else {
-          Toast.fail('步行路线数据查询失败' + result, 2);
+          // Toast.fail('步行路线数据查询失败' + result, 2);
+          Toast.fail('距离太远，建议选择驾车或公交出行', 1);
+          dispatch({ type: "home/changeState", data: { selectedNavigationWay: 3 } });
         }
       });
     })
@@ -354,6 +460,7 @@ export class HomeComponent extends Component {
 
   // 骑行导航
   renderRidingNavigation() {
+    Toast.loading("骑行路线规划中...");
     this.map.plugin('AMap.Riding', () => {
       this.ridingNavigation = new AMap.Riding({
         map: this.map,
@@ -367,16 +474,19 @@ export class HomeComponent extends Component {
       //根据起终点坐标规划骑行路线
       this.ridingNavigation.search([state!.get("currentLng"), state!.get("currentLat")], [state!.get("mapOnClickLng"), state!.get("mapOnClickLat")], (status: any, result: any) => {
         // result即是对应的骑行路线数据信息
+        Toast.hide();
         if (status === 'complete') {
-          console.log(result)
+          // console.log(result)
           // dispatch({ type: "home/changeState",
           //   data: {
           //     walkingNavigationStepsCount: result.routes[0].steps.length
           //   }
           // });
-          Toast.success('绘制骑行路线完成', 2);
+          Toast.success('骑行路线规划成功', 1);
         } else {
-          Toast.fail('骑行路线数据查询失败' + result, 2);
+          // Toast.fail('骑行路线数据查询失败' + result, 1);
+          Toast.fail('距离太远，建议选择驾车或公交出行', 1);
+          dispatch({ type: "home/changeState", data: { selectedNavigationWay: 3 } });
         }
       });
     })
@@ -385,6 +495,7 @@ export class HomeComponent extends Component {
 
   // 公交导航
   renderTransferNavigation() {
+    Toast.loading("公交路线规划中...");
     this.map.plugin('AMap.Transfer', () => {
       //构造公交换乘类
       this.transferNavigation = new AMap.Transfer({
@@ -402,14 +513,15 @@ export class HomeComponent extends Component {
       //根据起、终点坐标查询公交换乘路线
       this.transferNavigation.search([state!.get("currentLng"), state!.get("currentLat")], [state!.get("mapOnClickLng"), state!.get("mapOnClickLat")], (status: any, result: any) => {
         // result即是对应的公交路线数据信息
+        Toast.hide();
         if (status === 'complete') {
-          console.log(result)
+          console.log(result.info);
           // dispatch({ type: "home/changeState",
           //   data: {
           //     walkingNavigationStepsCount: result.routes[0].steps.length
           //   }
           // });
-          Toast.success('绘制公交路线完成', 2);
+          result.info === "NO_DATA" ? Toast.offline("距离太近，请选择步行或者骑行出行", 2) : Toast.success('公交路线规划成功', 1);
         } else {
           Toast.fail('公交路线数据查询失败' + result, 2);
         }
@@ -420,6 +532,7 @@ export class HomeComponent extends Component {
 
   // 驾车导航
   renderDrivingNavigation() {
+    Toast.loading("驾车路线规划中...");
     this.map.plugin('AMap.Driving', () => {
       // 构造路线导航类
       this.drivingNavigation = new AMap.Driving({
@@ -431,16 +544,18 @@ export class HomeComponent extends Component {
       // 根据起终点经纬度规划驾车导航路线
       this.drivingNavigation.search([state!.get("currentLng"), state!.get("currentLat")], [state!.get("mapOnClickLng"), state!.get("mapOnClickLat")], (status: any, result: any) => {
         // result 即是对应的驾车导航信息
+        Toast.hide();
         if (status === 'complete') {
-          console.log(result)
+          // console.log(result)
           // dispatch({ type: "home/changeState",
           //   data: {
           //     walkingNavigationStepsCount: result.routes[0].steps.length
           //   }
           // });
-          Toast.success('绘制驾车路线完成', 2);
+          Toast.success('驾车路线规划成功', 1);
         } else {
-          Toast.fail('获取驾车数据失败' + result, 2);
+          // Toast.fail('获取驾车数据失败' + result, 2);
+          Toast.fail('距离太远，建议选择公交出行', 1);
         }
       });
     })
@@ -469,7 +584,7 @@ export class HomeComponent extends Component {
 
   // 步行导航点击了取消按钮
   removeNavigation() {
-    this.map.remove(this.mapOnClickMarker); // 删除点击地图展示的marker
+    this.mapOnClickMarker && this.map.remove(this.mapOnClickMarker); // 删除点击地图展示的marker
 
     this.walkingNavigation && this.walkingNavigation.clear!(); // 清除规划的路线，clear()函数清除上一次结果，可以清除地图上绘制的路线以及路径文本结果
     this.ridingNavigation && this.ridingNavigation.clear!(); // 清除规划的路线，clear()函数清除上一次结果，可以清除地图上绘制的路线以及路径文本结果
@@ -494,6 +609,7 @@ export class HomeComponent extends Component {
     return <>
       {this.renderFooter()}
       {this.renderMapOnClickModalContent()}
+      {this.renderPylonMakerOnClick()}
     </>
   }
 
@@ -600,7 +716,7 @@ export class HomeComponent extends Component {
                   <a href={`navi:${selectedNavigationWay}&${currentLng}&${currentLat}&${mapOnClickLng}&${mapOnClickLat}`}>
                     <Button
                       type="primary"
-                      style={{ height: "100%", fontSize: "15px", lineHeight: "250%" }}
+                      style={{ height: "100%", fontSize: "15px", lineHeight: "250%", color: "#ffffff" }}
                     >
                       开始导航
                     </Button>

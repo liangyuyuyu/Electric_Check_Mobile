@@ -5,6 +5,7 @@ import { PylonsGetService } from "../service/index";
 import { Namespaces } from "./common";
 
 import * as Immutable from "immutable";
+import { StateType } from "rmc-tabs/lib/Tabs.base";
 
 
 app.model({
@@ -32,7 +33,11 @@ app.model({
     isRemoveNavigation: false, // 是否移出导航，退出导航选择界面时为true
     isRenderMapOnClick: 0, // 地图是否可以点击, 0:地图未渲染，1:给地图绑定点击事件，2:解绑地图上的点击事件
     pylons: null,
-    isRenderPylonsMaker: true // 是否渲染地图上电塔的标记，第一次渲染完电塔maker以后，赋值为false，避免重复渲染maker
+    isRenderPylonsMaker: true, // 是否渲染地图上电塔的标记，第一次渲染完电塔maker以后，赋值为false，避免重复渲染maker
+    isShowPylonModal: false, //是否展示电塔的信息modal框
+    currentOnClickPylonLng: 0, // 当前被点击电塔的经度
+    currentOnClickPylonLat: 0, // 当前被点击电塔的纬度
+    currentOnClickPylonIndex: -1, // 当前被点击电塔在电塔数组的下标
   }),
 
 
@@ -57,9 +62,11 @@ app.model({
 
   reducers: {
     changeState(state, { data }) {
-
-      console.log(data)
       return state.merge(data);
+    },
+
+    init(state) {
+      return state;
     }
   }
 

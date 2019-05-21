@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'dva';
 
-import { List, Accordion, NavBar } from "antd-mobile";
+import { List, Accordion, NavBar, Icon } from "antd-mobile";
+
+import { Alert } from "react-bootstrap";
 
 import { api_url } from "../../../functions/index";
 
@@ -12,6 +14,10 @@ export class ContactGroupingComponent extends Component {
     super(props);
   }
 
+  componentDidMount() {
+    dispatch({ type: "contact/getContactsGrouping" });
+  }
+
   renderTitle() {
     return <>
       <NavBar
@@ -19,7 +25,7 @@ export class ContactGroupingComponent extends Component {
         leftContent={<img src={`${api_url}/Assert/contact/left.png`} width='16px' height='16px' onClick={() => goBack()} />}
         rightContent={<img src={`${api_url}/Assert/home/refresh.png`} width='22px' height='22px' onClick={() => location.reload()} />}
         style={{ height: "7%", fontSize: "15" }}
-      >联系人分组 {state!.get("showLoading") ? <Icon type={"loading"} size="xs"/> : <></>}</NavBar>
+      >联系人分组 {state!.get("showLoading") ? <Icon type={"loading"} size="xs" /> : <></>}</NavBar>
     </>
   }
 
@@ -34,32 +40,40 @@ export class ContactGroupingComponent extends Component {
       <div style={{ width: "100%", height: "93%", overflowY: "auto" }}>
         <Accordion defaultActiveKey="0">
           <Accordion.Panel header={<div style={{ fontSize: "16px" }}>管理员</div>}>
-            <List>
-              {managers.length > 0 && managers.map((item: any, i: number) => {
-                return <ContactsItemInfo item={item} i={i} avatar={item.Sex === '0' ? 'manage_boy' : 'manage_girl'} badge={'管理员'} />;
-              })}
-            </List>
+            <Alert key={1} variant={"primary"}>
+              <List>
+                {managers.length > 0 && managers.map((item: any, i: number) => {
+                  return <ContactsItemInfo item={item} i={i} avatar={item.Sex === '0' ? 'manage_boy' : 'manage_girl'} badge={'管理员'} />;
+                })}
+              </List>
+            </Alert>
           </Accordion.Panel>
           <Accordion.Panel header={<div style={{ fontSize: "16px" }}>巡检人员</div>}>
-            <List>
-              {inspectors.length > 0 && inspectors.map((item: any, i: number) => {
-                return <ContactsItemInfo item={item} i={i} avatar={item.Sex === '0' ? 'check_boy' : 'check_girl'} badge={'巡检人员'} />;
-              })}
-            </List>
+            <Alert key={1} variant={"success"}>
+              <List>
+                {inspectors.length > 0 && inspectors.map((item: any, i: number) => {
+                  return <ContactsItemInfo item={item} i={i} avatar={item.Sex === '0' ? 'check_boy' : 'check_girl'} badge={'巡检人员'} />;
+                })}
+              </List>
+            </Alert>
           </Accordion.Panel>
           <Accordion.Panel header={<div style={{ fontSize: "16px" }}>维修人员</div>}>
-            <List>
-              {repairers.length > 0 && repairers.map((item: any, i: number) => {
-                return <ContactsItemInfo item={item} i={i} avatar={item.Sex === '0' ? 'repair_boy' : 'repair_girl'} badge={'维修人员'} />;
-              })}
-            </List>
+            <Alert key={1} variant={"warning"}>
+              <List>
+                {repairers.length > 0 && repairers.map((item: any, i: number) => {
+                  return <ContactsItemInfo item={item} i={i} avatar={item.Sex === '0' ? 'repair_boy' : 'repair_girl'} badge={'维修人员'} />;
+                })}
+              </List>
+            </Alert>
           </Accordion.Panel>
           <Accordion.Panel header={<div style={{ fontSize: "16px" }}>普通用户</div>}>
-            <List>
-              {users.length > 0 && users.map((item: any, i: number) => {
-                return <ContactsItemInfo item={item} i={i} avatar={item.Sex === '0' ? 'boy' : 'girl'} badge={'普通用户'} />;
-              })}
-            </List>
+            <Alert key={1} variant={"secondary"}>
+              <List>
+                {users.length > 0 && users.map((item: any, i: number) => {
+                  return <ContactsItemInfo item={item} i={i} avatar={item.Sex === '0' ? 'boy' : 'girl'} badge={'普通用户'} />;
+                })}
+              </List>
+            </Alert>
           </Accordion.Panel>
         </Accordion>
       </div>

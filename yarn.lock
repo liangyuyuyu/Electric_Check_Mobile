@@ -897,7 +897,7 @@
 
 "@babel/runtime@^7.4.2":
   version "7.4.4"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/@babel/runtime/-/runtime-7.4.4.tgz#dc2e34982eb236803aa27a07fea6857af1b9171d"
+  resolved "http://r.cnpmjs.org/@babel/runtime/download/@babel/runtime-7.4.4.tgz#dc2e34982eb236803aa27a07fea6857af1b9171d"
   integrity sha1-3C40mC6yNoA6onoH/qaFevG5Fx0=
   dependencies:
     regenerator-runtime "^0.13.2"
@@ -972,7 +972,7 @@
 
 "@react-bootstrap/react-popper@1.2.1":
   version "1.2.1"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/@react-bootstrap/react-popper/-/react-popper-1.2.1.tgz#4edf4851d5b4dcf2eb6b264ebbed1a7b7654177b"
+  resolved "http://r.cnpmjs.org/@react-bootstrap/react-popper/download/@react-bootstrap/react-popper-1.2.1.tgz#4edf4851d5b4dcf2eb6b264ebbed1a7b7654177b"
   integrity sha1-Tt9IUdW03PLrayZOu+0ae3ZUF3s=
   dependencies:
     babel-runtime "6.x.x"
@@ -984,12 +984,12 @@
 
 "@restart/context@^2.1.4":
   version "2.1.4"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/@restart/context/-/context-2.1.4.tgz#a99d87c299a34c28bd85bb489cb07bfd23149c02"
+  resolved "http://r.cnpmjs.org/@restart/context/download/@restart/context-2.1.4.tgz#a99d87c299a34c28bd85bb489cb07bfd23149c02"
   integrity sha1-qZ2HwpmjTCi9hbtInLB7/SMUnAI=
 
 "@restart/hooks@^0.2.3":
   version "0.2.13"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/@restart/hooks/-/hooks-0.2.13.tgz#de9a2dfd6dacac3b60f9b19614cdd49f90e434c3"
+  resolved "http://r.cnpmjs.org/@restart/hooks/download/@restart/hooks-0.2.13.tgz#de9a2dfd6dacac3b60f9b19614cdd49f90e434c3"
   integrity sha1-3pot/W2srDtg+bGWFM3Un5DkNMM=
 
 "@types/history@*":
@@ -3011,7 +3011,7 @@ create-react-class@^15.6.0:
 
 create-react-context@<=0.2.2:
   version "0.2.2"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/create-react-context/-/create-react-context-0.2.2.tgz#9836542f9aaa22868cd7d4a6f82667df38019dca"
+  resolved "http://r.cnpmjs.org/create-react-context/download/create-react-context-0.2.2.tgz#9836542f9aaa22868cd7d4a6f82667df38019dca"
   integrity sha1-mDZUL5qqIoaM19Sm+CZn3zgBnco=
   dependencies:
     fbjs "^0.8.0"
@@ -3019,7 +3019,7 @@ create-react-context@<=0.2.2:
 
 create-react-context@^0.2.1:
   version "0.2.3"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/create-react-context/-/create-react-context-0.2.3.tgz#9ec140a6914a22ef04b8b09b7771de89567cb6f3"
+  resolved "http://r.cnpmjs.org/create-react-context/download/create-react-context-0.2.3.tgz#9ec140a6914a22ef04b8b09b7771de89567cb6f3"
   integrity sha1-nsFAppFKIu8EuLCbd3HeiVZ8tvM=
   dependencies:
     fbjs "^0.8.0"
@@ -3488,7 +3488,7 @@ dom-converter@^0.2:
 
 dom-helpers@^3.4.0:
   version "3.4.0"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/dom-helpers/-/dom-helpers-3.4.0.tgz#e9b369700f959f62ecde5a6babde4bccd9169af8"
+  resolved "http://r.cnpmjs.org/dom-helpers/download/dom-helpers-3.4.0.tgz#e9b369700f959f62ecde5a6babde4bccd9169af8"
   integrity sha1-6bNpcA+Vn2Ls3lprq95LzNkWmvg=
   dependencies:
     "@babel/runtime" "^7.1.2"
@@ -4929,7 +4929,7 @@ growly@^1.3.0:
 
 gud@^1.0.0:
   version "1.0.0"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/gud/-/gud-1.0.0.tgz#a489581b17e6a70beca9abe3ae57de7a499852c0"
+  resolved "http://r.cnpmjs.org/gud/download/gud-1.0.0.tgz#a489581b17e6a70beca9abe3ae57de7a499852c0"
   integrity sha1-pIlYGxfmpwvsqavjrlfeekmYUsA=
 
 gzip-size@3.0.0:
@@ -6458,7 +6458,7 @@ jsx-ast-utils@^2.0.1:
 
 keycode@^2.2.0:
   version "2.2.0"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/keycode/-/keycode-2.2.0.tgz#3d0af56dc7b8b8e5cba8d0a97f107204eec22b04"
+  resolved "http://r.cnpmjs.org/keycode/download/keycode-2.2.0.tgz#3d0af56dc7b8b8e5cba8d0a97f107204eec22b04"
   integrity sha1-PQr1bce4uOXLqNCpfxByBO7CKwQ=
 
 keypress@0.1.x:
@@ -7965,7 +7965,7 @@ pn@^1.1.0:
 
 popper.js@^1.14.4, popper.js@^1.14.7:
   version "1.15.0"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/popper.js/-/popper.js-1.15.0.tgz#5560b99bbad7647e9faa475c6b8056621f5a4ff2"
+  resolved "http://r.cnpmjs.org/popper.js/download/popper.js-1.15.0.tgz#5560b99bbad7647e9faa475c6b8056621f5a4ff2"
   integrity sha1-VWC5m7rXZH6fqkdca4BWYh9aT/I=
 
 portfinder@^1.0.9:
@@ -8384,7 +8384,7 @@ prop-types-exact@^1.2.0:
 
 prop-types-extra@^1.1.0:
   version "1.1.0"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/prop-types-extra/-/prop-types-extra-1.1.0.tgz#32609910ea2dcf190366bacd3490d5a6412a605f"
+  resolved "http://r.cnpmjs.org/prop-types-extra/download/prop-types-extra-1.1.0.tgz#32609910ea2dcf190366bacd3490d5a6412a605f"
   integrity sha1-MmCZEOotzxkDZrrNNJDVpkEqYF8=
   dependencies:
     react-is "^16.3.2"
@@ -8693,7 +8693,7 @@ react-amap@^1.2.8:
 
 react-bootstrap@^1.0.0-beta.8:
   version "1.0.0-beta.8"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/react-bootstrap/-/react-bootstrap-1.0.0-beta.8.tgz#88d545526abe61c591d4eb84abad82e7f432c111"
+  resolved "http://r.cnpmjs.org/react-bootstrap/download/react-bootstrap-1.0.0-beta.8.tgz#88d545526abe61c591d4eb84abad82e7f432c111"
   integrity sha1-iNVFUmq+YcWR1OuEq62C5/QywRE=
   dependencies:
     "@babel/runtime" "^7.4.2"
@@ -8714,7 +8714,7 @@ react-bootstrap@^1.0.0-beta.8:
 
 react-context-toolbox@^2.0.2:
   version "2.0.2"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/react-context-toolbox/-/react-context-toolbox-2.0.2.tgz#35637287cb23f801e6ed802c2bb7a97e1f04e3fb"
+  resolved "http://r.cnpmjs.org/react-context-toolbox/download/react-context-toolbox-2.0.2.tgz#35637287cb23f801e6ed802c2bb7a97e1f04e3fb"
   integrity sha1-NWNyh8sj+AHm7YAsK7epfh8E4/s=
 
 react-dev-utils@^5.0.0:
@@ -8782,7 +8782,7 @@ react-native-swipeout@^2.2.2:
 
 react-overlays@^1.2.0:
   version "1.2.0"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/react-overlays/-/react-overlays-1.2.0.tgz#205368eeb0a5fb0b7f9b717fa7a12d518500abdb"
+  resolved "http://r.cnpmjs.org/react-overlays/download/react-overlays-1.2.0.tgz#205368eeb0a5fb0b7f9b717fa7a12d518500abdb"
   integrity sha1-IFNo7rCl+wt/m3F/p6EtUYUAq9s=
   dependencies:
     classnames "^2.2.6"
@@ -8796,7 +8796,7 @@ react-overlays@^1.2.0:
 
 react-popper@^1.3.2:
   version "1.3.3"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/react-popper/-/react-popper-1.3.3.tgz#2c6cef7515a991256b4f0536cd4bdcb58a7b6af6"
+  resolved "http://r.cnpmjs.org/react-popper/download/react-popper-1.3.3.tgz#2c6cef7515a991256b4f0536cd4bdcb58a7b6af6"
   integrity sha1-LGzvdRWpkSVrTwU2zUvctYp7avY=
   dependencies:
     "@babel/runtime" "^7.1.2"
@@ -8864,7 +8864,7 @@ react-test-renderer@^16.0.0-0:
 
 react-transition-group@^2.7.1:
   version "2.9.0"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/react-transition-group/-/react-transition-group-2.9.0.tgz#df9cdb025796211151a436c69a8f3b97b5b07c8d"
+  resolved "http://r.cnpmjs.org/react-transition-group/download/react-transition-group-2.9.0.tgz#df9cdb025796211151a436c69a8f3b97b5b07c8d"
   integrity sha1-35zbAleWIRFRpDbGmo87l7WwfI0=
   dependencies:
     dom-helpers "^3.4.0"
@@ -10714,12 +10714,12 @@ type-is@~1.6.16:
 
 typed-styles@^0.0.5:
   version "0.0.5"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/typed-styles/-/typed-styles-0.0.5.tgz#a60df245d482a9b1adf9c06c078d0f06085ed1cf"
+  resolved "http://r.cnpmjs.org/typed-styles/download/typed-styles-0.0.5.tgz#a60df245d482a9b1adf9c06c078d0f06085ed1cf"
   integrity sha1-pg3yRdSCqbGt+cBsB40PBghe0c8=
 
 typed-styles@^0.0.7:
   version "0.0.7"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/typed-styles/-/typed-styles-0.0.7.tgz#93392a008794c4595119ff62dde6809dbc40a3d9"
+  resolved "http://r.cnpmjs.org/typed-styles/download/typed-styles-0.0.7.tgz#93392a008794c4595119ff62dde6809dbc40a3d9"
   integrity sha1-kzkqAIeUxFlRGf9i3eaAnbxAo9k=
 
 typedarray@^0.0.6:
@@ -10817,7 +10817,7 @@ umi-test@^0.6.0-beta.1:
 
 uncontrollable@^6.0.0, uncontrollable@^6.1.0:
   version "6.1.0"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/uncontrollable/-/uncontrollable-6.1.0.tgz#45dcf54b76bf07e0ddf7c1a669caf935d2e101d5"
+  resolved "http://r.cnpmjs.org/uncontrollable/download/uncontrollable-6.1.0.tgz#45dcf54b76bf07e0ddf7c1a669caf935d2e101d5"
   integrity sha1-Rdz1S3a/B+Dd98Gmacr5NdLhAdU=
   dependencies:
     invariant "^2.2.4"
