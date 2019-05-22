@@ -35,9 +35,9 @@ export class ContactGroupingComponent extends Component {
       repairers = state!.get("repairers") || [],
       users = state!.get("users") || [];
 
-    return <>
+    return <div style={{ width: "100%", height: "100%" }}>
       {this.renderTitle()}
-      <div style={{ width: "100%", height: "93%", overflowY: "auto" }}>
+      <div style={{ width: "100%", height: "93%", overflowY: "auto", overflowX: "hidden" }}>
         <Accordion defaultActiveKey="0">
           <Accordion.Panel header={<div style={{ fontSize: "16px" }}>管理员</div>}>
             <Alert key={1} variant={"primary"}>
@@ -77,7 +77,7 @@ export class ContactGroupingComponent extends Component {
           </Accordion.Panel>
         </Accordion>
       </div>
-    </>
+    </div>
   }
 
 

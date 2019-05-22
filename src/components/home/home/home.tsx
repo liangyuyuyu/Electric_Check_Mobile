@@ -4,22 +4,21 @@ import { connect } from 'dva';
 
 import NProgress from 'nprogress';
 
-import { NoticeBar, SearchBar, NavBar, Icon, InputItem, WingBlank, Button, WhiteSpace, Flex, Checkbox, TabBar, Toast, Modal, List, Badge, SegmentedControl, Accordion } from "antd-mobile";
+import { NoticeBar, SearchBar, NavBar, Icon, InputItem, WingBlank, Button, WhiteSpace, Flex, Checkbox, TabBar, Toast, Modal, List, Badge, SegmentedControl, Drawer, Accordion } from "antd-mobile";
 
-import { Modal as BTModal, Button as BTButton } from "react-bootstrap";
+import { Modal as BTModal, Button as BTButton, Alert, Form } from "react-bootstrap";
 
 import { api_url } from "../../../functions/index";
 
 import { PylonIconType } from "../models/index";
 
-import { Title, Tasks, Contacts, My } from './common';
+import { Tasks, Contacts, My, pylonStatusBadge, PylonStatusColor, PylonStatusString } from './common';
 
 export class HomeComponent extends Component {
   constructor(props) {
     super(props);
   }
 
-  isFirstDW = true; // 是否是第一次定位
   map: any;
   bindClickOnMap: any; // 点击事件绑定到地图上
   mapOnClickMarker: any;
@@ -52,13 +51,28 @@ export class HomeComponent extends Component {
     Toast.hide(); // 全局配置和全局销毁Toast的方法
   }
 
+  renderTitle(title: any, showLoading: boolean) {
+    return <>
+        <NavBar
+            mode="dark"
+            leftContent={<Icon key="1" type="ellipsis" />}
+            onLeftClick={() => dispatch({ type: "home/changeState", data: { isShowSideBar: true } })}
+            rightContent={<img src={`${api_url}/Assert/home/refresh.png`} width='22px' height='22px' onClick={() => location.reload()} />}
+            style={{ height: "7%", fontSize: "15" }}
+        >
+            {title} 
+            {showLoading ? <Icon type={"loading"} size="xs"/> : <></>}
+        </NavBar>
+    </>
+  }
+
   renderMap() {
     this.map = new AMap.Map('mapDiv', {
       resizeEnable: true, // 是否监控地图容器尺寸变化，默认值为false
       // mapStyle: , // 设置地图的显示样式, https://lbs.amap.com/dev/mapstyle/index
       expandZoomRange: true, // 是否支持可以扩展最大缩放级别,和zooms属性配合使用,设置为true的时候，zooms的最大级别在PC上可以扩大到20级，移动端还是高清19/非高清20
       center: [121.629114, 31.186431],
-      // zooms: [4,18],//设置地图级别范围
+      // zooms: [10,24],//设置地图级别范围
       zoom: 13,
       showIndoorMap: true, // 是否在有矢量底图的时候自动展示室内地图，PC端默认是true，移动端默认是false
       // rotateEnable: true, // 地图是否可旋转，3D视图默认为true，2D视图默认false
@@ -205,13 +219,13 @@ export class HomeComponent extends Component {
             dispatch({
               type: "home/changeState",
               data: {
-                isShowMapOnClickModal: false,
-                mapOnClickLng: 0, // 点击地图上某个点，该点的经度
-                mapOnClickLat: 0, // 点击地图上某个点，该点的纬度
-                mapOnClickAddress: '', // 点击地图上某个点，该点的地址
-                mapOnClickCrosses: '', // 点击地图上某个点，该点的最近的路口
-                mapOnClickRoad: '', // 点击地图上某个点，该点的最近的路
-                mapOnClickPois: null, // 点击地图上某个点，该点的附近地点 } });
+                isShowMapOnClickModal: false
+                // mapOnClickLng: 0, // 点击地图上某个点，该点的经度
+                // mapOnClickLat: 0, // 点击地图上某个点，该点的纬度
+                // mapOnClickAddress: '', // 点击地图上某个点，该点的地址
+                // mapOnClickCrosses: '', // 点击地图上某个点，该点的最近的路口
+                // mapOnClickRoad: '', // 点击地图上某个点，该点的最近的路
+                // mapOnClickPois: null, // 点击地图上某个点，该点的附近地点 } });
               }
             });
           }
@@ -227,6 +241,91 @@ export class HomeComponent extends Component {
       onClose={() => {
         this.mapOnClickMarker && this.map.remove(this.mapOnClickMarker);
         dispatch({ type: "home/changeState", data: { isShowMapOnClickModal: false } });
+      }} // 点击 x 或 mask 回调 (): void
+      style={{ maxHeight: "70%", overflowY: "auto", overflowX: "hidden" }}
+    >
+      <List>
+        {keyArray.map((item: any, index: number) => (
+          <List.Item wrap={true} key={index}>
+            <table style={{ width: "100%" }}>
+              <tr>
+                <td style={{ width: "25%" }}>{item}</td>
+                <td style={{ width: "75%" }}>{valueArray[index]}</td>
+              </tr>
+            </table>
+          </List.Item>
+        ))}
+      </List>
+    </Modal>
+  }
+
+  renderMapPylonsModalContent() {
+    const pylons = state!.get("pylons"),
+      isShowPylonInfoModal = state!.get("isShowPylonInfoModal"),
+      currentOnClickPylonIndex = state!.get("currentOnClickPylonIndex"),
+      currentLng = state!.get("currentLng"),
+      currentLat = state!.get("currentLat"),
+      valueArray: any = [],
+      keyArray: any = [];
+
+    let distance = "";
+    if(currentOnClickPylonIndex >= 0){
+      const pylonInfo = pylons.data[currentOnClickPylonIndex];
+
+      distance=(AMap.GeometryUtil.distance([currentLng, currentLat], [pylonInfo.Lng, pylonInfo.Lat]) / 1000).toFixed(2); // 计算地面距离，单位：米
+
+      keyArray.push("经纬度:");
+      valueArray.push(`${pylonInfo.Lng},${pylonInfo.Lat}`);
+      
+      keyArray.push("电塔名称:");
+      valueArray.push(`电塔${pylonInfo.Number}号`);
+
+      keyArray.push("详细地址:");
+      valueArray.push(pylonInfo.Address);
+
+      keyArray.push("电塔简介:");
+      valueArray.push(pylonInfo.Introduce);
+
+      keyArray.push("问题数量:");
+      valueArray.push(pylonInfo.Problems);
+
+      keyArray.push("当前状态:");
+      valueArray.push(pylonStatusBadge(pylonInfo.State));
+    }
+
+    return currentOnClickPylonIndex >= 0 && <Modal
+      popup // 是否弹窗模式
+      visible={isShowPylonInfoModal} // 对话框是否可见
+      // closable={true} // 是否显示关闭按钮
+      maskClosable={true} // 点击蒙层是否允许关闭
+      animationType="slide-up" // 可选: 'slide-down / up' / 'fade' / 'slide'
+      title={<span>详情 | <img src={`${api_url}/Assert/home/distance.png`} style={{ width: "27px", height: "27px" }} />{distance}km</span>} // 标题 React.Element
+      footer={[
+        {
+          text: '取消', onPress: () => {
+            dispatch({
+              type: "home/changeState",
+              data: {
+                isShowPylonInfoModal: false,
+                // currentOnClickPylonLng: 0, // 当前被点击电塔的经度
+                // currentOnClickPylonLat: 0, // 当前被点击电塔的纬度
+                // currentOnClickPylonIndex: -1, // 当前被点击电塔在电塔数组的下标
+              }
+            });
+          }
+        },
+        {
+          text: '去这里', onPress: () => dispatch({
+            type: "home/changeState", data: {
+              isShowPylonInfoModal: false, isShowNavigationChoice: true, isRenderMapOnClick: 2,
+              mapOnClickLng: pylons.data[currentOnClickPylonIndex].Lng,
+              mapOnClickLat: pylons.data[currentOnClickPylonIndex].Lat
+            }
+          })
+        }
+      ]} // 底部内容  Array {text, onPress}
+      onClose={() => {
+        dispatch({ type: "home/changeState", data: { isShowPylonInfoModal: false } });
       }} // 点击 x 或 mask 回调 (): void
       style={{ maxHeight: "70%", overflowY: "auto", overflowX: "hidden" }}
     >
@@ -275,7 +374,7 @@ export class HomeComponent extends Component {
           }}
           style={{ width: "33%", fontSize: "15px" }}>电塔周边</BTButton>
         <BTButton variant="outline-info"
-          onClick={() => dispatch({ type: "home/changeState", data: { isShowPylonModal: false } })}
+          onClick={() => dispatch({ type: "home/changeState", data: { isShowPylonModal: false, isShowPylonInfoModal: true } })}
           style={{ width: "33%", fontSize: "15px" }}>电塔信息</BTButton>
         <BTButton variant="outline-success"
           onClick={() => dispatch({
@@ -286,6 +385,24 @@ export class HomeComponent extends Component {
           style={{ width: "33%", fontSize: "15px" }}>去这里</BTButton>
       </BTModal.Footer>
     </BTModal>
+  }
+
+  // 在地图上渲染圆圈
+  renderMapCircle(lng: any, lat: any, i: number) {
+    let circleMarker = new AMap.CircleMarker({
+      center: new AMap.LngLat(lng, lat),  // 圆心位置
+      radius: 50, //半径
+      strokeColor: PylonStatusColor[i],  // 线条颜色
+      strokeOpacity: 0.5, // 轮廓线透明度，取值范围[0,1]
+      strokeWeight: 3, // 轮廓线宽度
+      fillOpacity: 0.3, // 圆形填充透明度，取值范围[0,1]
+      strokeStyle: 'dashed', // 轮廓线样式，实线:solid，虚线:dashed
+      strokeDasharray: [10, 10], // 勾勒形状轮廓的虚线和间隙的样式，此属性在strokeStyle 为dashed 时有效
+      fillColor: '#1791fc', // 圆形填充颜色
+      zIndex: 50, // 层叠顺序 默认zIndex:10
+    });
+  
+    this.map.add(circleMarker);
   }
 
   renderMapPylonsMarker(pylons: any) {
@@ -299,8 +416,7 @@ export class HomeComponent extends Component {
 
       let onMarkerClick = e => {
         const lnglat = e.target.getPosition();
-        console.log(lnglat);
-        // this.renderMapService(lnglat.lng, lnglat.lat)
+
         dispatch({
           type: "home/changeState",
           data: {
@@ -314,6 +430,8 @@ export class HomeComponent extends Component {
 
       marker.on('click', onMarkerClick);//绑定click事件
       this.map.add(marker);//添加到地图
+
+      this.renderMapCircle(item.Lng, item.Lat, Number(item.State));
 
       dispatch({ type: "home/changeState", data: { isRenderPylonsMaker: false } });
     })
@@ -379,20 +497,19 @@ export class HomeComponent extends Component {
           // 'animation': 'AMAP_ANIMATION_BOUNCE', // 点标记的动画效果, AMAP_ANIMATION_NONE:无动画效果，AMAP_ANIMATION_DROP:点标掉落效果，AMAP_ANIMATION_BOUNCE:点标弹跳效果 
           'autoRotation': true // 是否自动旋转。点标记在使用moveAlong动画时，路径方向若有变化，点标记是否自动调整角度，默认为false。广泛用于自动调节车辆行驶方向。
         },
-        showCircle: true,        // 定位成功后用圆圈表示定位精度范围，默认：true
-        circleOptions: { // 定位点Circle的配置，不设置该属性则使用默认Circle样式
-          radius: 20, // 圆半径
-          fillColor: '#1791fc',   // 圆形填充颜色
-          strokeColor: '#FF33FF', // 描边颜色
-          strokeWeight: 6, // 描边宽度
-          borderWeight: 2,
-          strokeOpacity: 0.2,
-          fillOpacity: 0.4,
-          strokeStyle: 'dashed',
-          strokeDasharray: [10, 10],
-          // 线样式还支持 'dashed'
-          zIndex: 50,
-        },
+        // showCircle: false,        // 定位成功后用圆圈表示定位精度范围，默认：true
+        // circleOptions: { // 定位点Circle的配置，不设置该属性则使用默认Circle样式
+        //   radius: 20, // 圆半径
+        //   fillColor: '#1791fc',   // 圆形填充颜色
+        //   strokeColor: '#FF33FF', // 描边颜色
+        //   strokeWeight: 6, // 描边宽度
+        //   borderWeight: 2,
+        //   strokeOpacity: 0.2,
+        //   fillOpacity: 0.4,
+        //   strokeStyle: 'dashed',
+        //   strokeDasharray: [10, 10],
+        //   zIndex: 50,
+        // },
         panToLocation: true,     // 定位成功后将定位到的位置作为地图中心点，默认：true
         zoomToAccuracy: true,     // 定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
         useNative: true, // 是否使用安卓定位sdk用来进行定位，默认：false, 适用于同时在APP中使用安卓定位sdk并在APP WebView中使用了JSAPI的开发者。开启后，将优先尝试使用sdk进行定位，失败后依次尝试浏览器定位和IP定位。
@@ -606,11 +723,203 @@ export class HomeComponent extends Component {
       : state!.get("isRenderMapOnClick") === 2 && this.map.off('click', this.bindClickOnMap); // 解绑地图上绑定的点击事件
 
     console.log(state!.toJS())
-    return <>
+    return <Drawer
+      transitions // 是否开启动画
+      touch // 是否开启触摸手势
+      position={"left"} // 抽屉所在位置, 'left', 'right', 'top', 'bottom'
+      dragToggleDistance={30} // 打开关闭抽屉时距 sidebar 的拖动距离
+      className="my-drawer"
+      sidebarStyle={{ width: '60%', height: "100%", backgroundColor: "#ffffff" }}
+      sidebar={this.renderSideBar()} // 抽屉里的内容
+      open={state!.get("isShowSideBar")} // 开关状态
+      onOpenChange={e => dispatch({ type: "home/changeState", data: { isShowSideBar: false } })} //	open 状态切换时调用
+    >
       {this.renderFooter()}
       {this.renderMapOnClickModalContent()}
       {this.renderPylonMakerOnClick()}
-    </>
+      {this.renderMapPylonsModalContent()}
+      {this.renderAddPylonModal()}
+    </Drawer>
+  }
+
+  // 渲染添加电塔的表单
+  renderAddPylonModal() {
+    return <Modal
+      popup // 是否弹窗模式
+      visible={state!.get("isRenderAddPylonModal")} // 对话框是否可见
+      // closable={true} // 是否显示关闭按钮
+      maskClosable={true} // 点击蒙层是否允许关闭
+      animationType="slide-up" // 可选: 'slide-down / up' / 'fade' / 'slide'
+      style={{ height: "100%" }}
+    >
+      <NavBar mode="dark" style={{ height: "6.5%", fontSize: "15px" }} >添加电塔表单</NavBar>
+      <Form style={{ width:"100%", height:"93.5%" }}>
+          <div style={{ width:"100%", height:"94%", overflowY: "auto", overflowX: "hidden", padding: "15px", textAlign: "left" }}>
+              <Form.Group controlId="pylonName">
+                <Form.Label style={{color: "black"}}>电塔名称：</Form.Label>
+                <Form.Control style={{fontSize: "15px"}} required type="text" placeholder="请输入电塔的名称" value={"电塔14号"} disabled />
+                <Form.Text className="text-muted">此项不可修改</Form.Text>
+                <Form.Control.Feedback>检查通过</Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group controlId="pylonLng">
+                <Form.Label style={{color: "black"}}>电塔经度：</Form.Label>
+                <Form.Control style={{fontSize: "15px"}} required type="number" placeholder="请输入电塔的经度(必填)" onChange={e => console.log(e.target.value)} />
+                <Form.Text className="text-muted">只能输入数字或小数</Form.Text>
+                <Form.Control.Feedback>检查通过</Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group controlId="pylonName">
+                <Form.Label style={{color: "black"}}>电塔维度：</Form.Label>
+                <Form.Control style={{fontSize: "15px"}} required type="number" placeholder="请输入电塔的维度(必填)" onChange={e => console.log(e.target.value)} />
+                <Form.Text className="text-muted">只能输入数字或小数</Form.Text>
+                <Form.Control.Feedback>检查通过</Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group controlId="pylonIntruduce">
+                <Form.Label style={{color: "black"}}>电塔介绍：</Form.Label>
+                <Form.Control style={{fontSize: "15px"}} as="textarea" required  placeholder="请输入电塔的介绍(必填)" rows="3" onChange={e => console.log(e.target.value)}/>
+                <Form.Control.Feedback>检查通过</Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group controlId="pylonAddress">
+                <Form.Label style={{color: "black"}}>电塔地址：</Form.Label>
+                <Form.Control style={{fontSize: "15px"}} type="text" required placeholder="请输入电塔的地址(必填)" onChange={e => console.log(e.target.value)} />
+                <Form.Text className="text-muted">必须输入详细地址</Form.Text>
+                <Form.Control.Feedback>检查通过</Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group controlId="pylonProblems">
+                <Form.Label style={{color: "black"}}>曾出现的问题数：</Form.Label>
+                <Form.Control style={{fontSize: "15px"}} type="number" placeholder="请输入电塔的曾出现的问题数" onChange={e => console.log(e.target.value)} />
+                <Form.Text className="text-muted">只能输入整数</Form.Text>
+                <Form.Control.Feedback>检查通过</Form.Control.Feedback>
+              </Form.Group>
+              <Form.Group controlId="pylonState">
+                <Form.Label style={{color: "black"}}>电塔状态：</Form.Label>
+                <Form.Control style={{fontSize: "15px"}} as="select" onChange={e => console.log(e.target.value)}>
+                  <option value={0} selected>运行正常</option>
+                  <option value={1}>正在巡检中</option>
+                  <option value={2}>正在维修中</option>
+                  <option value={3}>一级危险中</option>
+                  <option value={4}>二级危险中</option>
+                  <option value={5}>三级危险中</option>
+                </Form.Control>
+              </Form.Group>
+          </div>
+          <div style={{ width:"100%", height:"6%" }}>
+            <BTButton variant="outline-secondary" style={{width: "50%", height: "100%"}} 
+              onClick={()=>dispatch({ type: "home/changeState", data: { isRenderAddPylonModal: false } })}>取消</BTButton>
+            <BTButton type="submit" variant="outline-primary" style={{width: "50%", height: "100%"}}>添加</BTButton>
+          </div>
+      </Form>
+    </Modal>
+  }
+
+  // 管理员点击发起巡检、维修任务时，先判断当前是否有需要巡检、维修的电塔
+  assignmentBefore(status: number, pylonCount: number) {
+    if(status === 1) { // 管理员发起了巡检任务，判断当前是否有需要巡检的电塔
+      if(pylonCount === 0) {
+        Toast.info("当前没有需要巡检的电塔", 2);
+        return;
+      }
+    } else if(status === 2) { // 管理员发起了维修任务，判断当前是否有需要维修的电塔
+      if(pylonCount === 0) {
+        Toast.info("当前没有需要维修的电塔", 2);
+        return;
+      }
+    }
+    dispatch({ type: "home/changeState", data: { isShowAssignmentsModal: true, isShowSideBar: false } });
+  }
+  
+  renderSideBar() {
+    const pylonsType = state!.get("pylonsType"),
+      isCurrentUserManager = state!.get("isCurrentUserManager"),
+      isCurrentUserInspector = state!.get("isCurrentUserInspector"),
+      isCurrentUserRepairer = state!.get("isCurrentUserRepairer"),
+      normalCount = pylonsType ? pylonsType.normal.length : 0,
+      dangeringCount = pylonsType ? pylonsType.dangering1.length + pylonsType.dangering2.length + pylonsType.dangering3.length : 0;
+
+    return <div style={{ width: '100%', height: "100%" }}>
+      <NavBar mode="dark" style={{ height: "6.5%", fontSize: "15px" }} >操作</NavBar>
+      <div style={{ height: "93.5%", overflowY: "auto", overflowX: "hidden" }}>
+        {pylonsType && <Accordion>
+          <Accordion.Panel header={<div style={{ fontSize: "15px" }}>所有电塔</div>}>
+            <Alert key={1} variant="primary">
+              <List>
+                {PylonStatusString.map((item: any, i: number) => <List.Item key={i}
+                  extra={
+                    i===0 ? normalCount
+                      : i===1 ? pylonsType.checking.length
+                      : i===2 ? pylonsType.repairing.length
+                      : i===3 ? pylonsType.dangering1.length
+                      : i===4 ? pylonsType.dangering2.length
+                      : i===5 && pylonsType.dangering3.length
+                  }>
+                  {item}
+                </List.Item>)}
+              </List>
+            </Alert>
+          </Accordion.Panel>
+        </Accordion>}
+        {isCurrentUserManager && pylonsType &&
+          <Accordion>
+            <Accordion.Panel header={<div style={{ fontSize: "15px" }}>发起任务</div>}>
+              <Alert key={2} variant="warning">
+                <List>
+                  <List.Item onClick={() => this.assignmentBefore(1, normalCount)} extra={normalCount}>
+                    发起巡检任务
+                  </List.Item>
+                  <List.Item onClick={() => this.assignmentBefore(2, dangeringCount)} extra={dangeringCount}>
+                    发起维修任务
+                  </List.Item>
+                </List>
+              </Alert>
+            </Accordion.Panel>
+          </Accordion>
+        }
+        {isCurrentUserManager &&
+          <List>
+            <List.Item onClick={() => dispatch({ type: "home/changeState", data: { isRenderAddPylonModal: true } })}>
+              添加电塔
+            </List.Item>
+          </List>
+        }
+        {isCurrentUserInspector &&
+          <Accordion>
+            <Accordion.Panel header={<div style={{ fontSize: "15px" }}>巡检任务</div>}>
+              <Alert key={2} variant="success">
+                <List>
+                  <List.Item onClick={() => console.log("完成巡检任务1")}>
+                    巡检任务1
+                  </List.Item>
+                  <List.Item onClick={() => console.log("完成巡检任务2")}>
+                    巡检任务2
+                  </List.Item>
+                  <List.Item onClick={() => console.log("完成巡检任务2")}>
+                    巡检任务3
+                  </List.Item>
+                </List>
+              </Alert>
+            </Accordion.Panel>
+          </Accordion>
+        }
+        {isCurrentUserRepairer &&
+          <Accordion>
+            <Accordion.Panel header={<div style={{ fontSize: "15px" }}>维修任务</div>}>
+              <Alert key={3} variant="danger">
+                <List>
+                  <List.Item onClick={() => console.log("完成维修任务1")}>
+                    维修任务1
+                  </List.Item>
+                  <List.Item onClick={() => console.log("完成维修任务2")}>
+                    维修任务2
+                  </List.Item>
+                  <List.Item onClick={() => console.log("完成维修任务2")}>
+                    维修任务3
+                  </List.Item>
+                </List>
+              </Alert>
+            </Accordion.Panel>
+          </Accordion>
+        }
+      </div>
+    </div>
   }
 
   // 地图的输入提示插件
@@ -643,6 +952,10 @@ export class HomeComponent extends Component {
     })
   }
 
+  renderAssignmentsModal() {
+
+  }
+
   renderHomeMap() {
     const mapOnClickLng = state!.get("mapOnClickLng"),
       mapOnClickLat = state!.get("mapOnClickLat"),
@@ -670,7 +983,7 @@ export class HomeComponent extends Component {
     >
       {!state!.get("isShowNavigationChoice") ?
         <>
-          <Title title={"巡检地图"} showLoading={state!.get("showLoading")} />
+          {this.renderTitle("巡检地图", state!.get("showLoading"))}
           <div style={{ width: "100%", height: "6%", padding: "3px", backgroundColor: "#efeff4" }}>
             <input
               name={"searchKey"}
@@ -681,16 +994,13 @@ export class HomeComponent extends Component {
               <Icon type="search" size={"md"} style={{ color: "#0a8cf7", width: "80%", height: "80%" }} />
             </div>
           </div>
-
         </>
         : <>
           <SegmentedControl
             style={{ height: "6%", fontSize: "15px" }}
             selectedIndex={selectedNavigationWay}
             values={SegmentedControlValues}
-            onChange={e => dispatch({
-              type: "home/changeState", data: { selectedNavigationWay: e.nativeEvent.selectedSegmentIndex }
-            })} />
+            onChange={e => dispatch({ type: "home/changeState", data: { selectedNavigationWay: e.nativeEvent.selectedSegmentIndex } })} />
           <div style={{ width: "100%", height: "35%" }} >
             <div id="naviPanel" style={{ width: "100%", overflowY: "auto", height: "85%" }} />
             <div style={{ width: "100%", height: "15%" }}>

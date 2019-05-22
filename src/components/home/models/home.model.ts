@@ -5,7 +5,6 @@ import { PylonsGetService } from "../service/index";
 import { Namespaces } from "./common";
 
 import * as Immutable from "immutable";
-import { StateType } from "rmc-tabs/lib/Tabs.base";
 
 
 app.model({
@@ -33,11 +32,24 @@ app.model({
     isRemoveNavigation: false, // 是否移出导航，退出导航选择界面时为true
     isRenderMapOnClick: 0, // 地图是否可以点击, 0:地图未渲染，1:给地图绑定点击事件，2:解绑地图上的点击事件
     pylons: null,
+    pylonsType: null,
     isRenderPylonsMaker: true, // 是否渲染地图上电塔的标记，第一次渲染完电塔maker以后，赋值为false，避免重复渲染maker
-    isShowPylonModal: false, //是否展示电塔的信息modal框
+    isShowPylonsModal: false, // 是否展示电塔的信息modal
+    isShowPylonInfoModal: false, //是否展示电塔的信息modal框
     currentOnClickPylonLng: 0, // 当前被点击电塔的经度
     currentOnClickPylonLat: 0, // 当前被点击电塔的纬度
     currentOnClickPylonIndex: -1, // 当前被点击电塔在电塔数组的下标
+
+    isShowSideBar: false, // 是否展示SideBar
+
+    isCurrentUserManager: true, // 当前的用户是否是管理员
+    isCurrentUserInspector: true, // 当前的用户是否是巡检人员
+    isCurrentUserRepairer: true, // 当前的用户是否是维修人员
+    isCurrentUserCommon: true, // 当前的用户是否是普通用户
+
+    isShowAssignmentsModal: false, // 是否展示管理员分配任务的框
+
+    isRenderAddPylonModal: false // 是否展示管理员添加电塔的框
   }),
 
 
@@ -50,7 +62,17 @@ app.model({
 
         const pylons = yield call(PylonsGetService);
 
-        yield put({ type: "changeState", data: { pylons: pylons } });
+        let pylonsType:any = { normal:[], checking:[], repairing:[], dangering1: [], dangering2: [], dangering3: [] };
+        pylons && pylons.data && pylons.data.map(item => {
+          if(item.State === "0") pylonsType.normal.push(item)
+          else if(item.State === "1") pylonsType.checking.push(item)
+          else if(item.State === "2") pylonsType.repairing.push(item)
+          else if(item.State === "3") pylonsType.dangering1.push(item)
+          else if(item.State === "4") pylonsType.dangering2.push(item)
+          else if(item.State === "5") pylonsType.dangering3.push(item)
+        })
+
+        yield put({ type: "changeState", data: { pylons: pylons, pylonsType: pylonsType } });
 
       } catch (error) {
         fail!(error.errmsg);

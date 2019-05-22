@@ -2096,6 +2096,11 @@ boom@2.x.x:
   dependencies:
     hoek "2.x.x"
 
+bootstrap@^4.3.1:
+  version "4.3.1"
+  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/bootstrap/-/bootstrap-4.3.1.tgz#280ca8f610504d99d7b6b4bfc4b68cec601704ac"
+  integrity sha1-KAyo9hBQTZnXtrS/xLaM7GAXBKw=
+
 boxen@^1.2.1:
   version "1.3.0"
   resolved "http://r.cnpmjs.org/boxen/download/boxen-1.3.0.tgz#55c6c39a8ba58d9c61ad22cd877532deb665a20b"

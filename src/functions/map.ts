@@ -26,6 +26,14 @@ declare namespace AMap {
         constructor(...args);
     }
 
+    class CircleMarker {
+        constructor(...args);
+    }
+
+    class LngLat {
+        constructor(...args);
+    }
+
     class Walking {
         constructor(...args);
 
