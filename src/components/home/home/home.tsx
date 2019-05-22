@@ -722,7 +722,7 @@ export class HomeComponent extends Component {
     state!.get("isRenderMapOnClick") === 1 ? this.map.on('click', this.bindClickOnMap) // 在地图上绑定点击事件
       : state!.get("isRenderMapOnClick") === 2 && this.map.off('click', this.bindClickOnMap); // 解绑地图上绑定的点击事件
 
-    console.log(state!.toJS())
+    // console.log(state!.toJS())
     return <Drawer
       transitions // 是否开启动画
       touch // 是否开启触摸手势
@@ -749,7 +749,7 @@ export class HomeComponent extends Component {
       visible={state!.get("isRenderAddPylonModal")} // 对话框是否可见
       // closable={true} // 是否显示关闭按钮
       maskClosable={true} // 点击蒙层是否允许关闭
-      animationType="slide-up" // 可选: 'slide-down / up' / 'fade' / 'slide'
+      animationType="slide-down" // 可选: 'slide-down / up' / 'fade' / 'slide'
       style={{ height: "100%" }}
     >
       <NavBar mode="dark" style={{ height: "6.5%", fontSize: "15px" }} >添加电塔表单</NavBar>
