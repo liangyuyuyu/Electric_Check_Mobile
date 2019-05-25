@@ -1,5 +1,8 @@
-import { app } from "../../../functions/index"
-import { Namespaces } from "./common"
+import { app } from "../../../functions/index";
+
+import { Namespaces } from "./common";
+
+import { LoginHttpService } from "../service/index";
 
 import * as Immutable from "immutable";
 
@@ -11,19 +14,30 @@ app.model({
   state: Immutable.fromJS({
     phone: "",
     password: "",
-    agreeChecked: true
+    agreeChecked: true,
+    isRenderAgreementModal: false, // 是否渲染用户写窗口
+    currentUser: null
   }),
-  // {
-  //   phone: "",
-  //   password: "",
-  //   agreeChecked: true
-  // },
 
 
   effects: {
-    *fetch({ payload }, { call, put }) {  // eslint-disable-line
-      yield put({ type: 'save' });
-    },
+    *loginCheck({ callback }, { call, put, select }) { // 管理员发布任务
+      try {
+        const { login } = yield select(state => ({ login: state[Namespaces.login].toJS() }));
+
+        const submitResult = yield call(LoginHttpService, login.phone);
+
+        if (!submitResult.data) yield call(callback, 2); // 账号不对
+        else if (submitResult.data.Password !== login.password) yield call(callback, 3); // 密码不对
+        else {
+          yield put({ type: "changeState", data: { currentUser: submitResult.data } });
+          yield call(callback, 1); // 登录成功
+        }
+      } catch (error) {
+        yield call(callback, 0, error);
+      } finally {
+      }
+    }
   },
 
   reducers: {

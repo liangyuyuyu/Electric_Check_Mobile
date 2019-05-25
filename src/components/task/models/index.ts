@@ -1,2 +1,2 @@
 export * from "./common";
-export * from "./home.model";
+export * from "./task.model";

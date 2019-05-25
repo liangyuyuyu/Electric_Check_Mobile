@@ -53,6 +53,7 @@ export class ContactComponent extends Component {
         <List>
           <Link to={"/contact/contactGrouping"}>
             <List.Item
+              key={"zu"}
               thumb={<div style={{ color: "black", ...groupingAvatarStyle }} >组</div>}
               extra={<a style={{ fontSize: "15px" }}>查看</a>}
               multipleLine={true}
@@ -87,9 +88,9 @@ export class ContactComponent extends Component {
         barTintColor="white"
       >
         {HomeMap(goTo)}
-        {Tasks()}
+        {Tasks(goTo)}
         {this.renderContacts()}
-        {My()}
+        {My(goTo)}
       </TabBar>
     </div>
   }

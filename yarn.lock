@@ -896,9 +896,9 @@
     regenerator-runtime "^0.13.2"
 
 "@babel/runtime@^7.4.2":
-  version "7.4.4"
-  resolved "http://r.cnpmjs.org/@babel/runtime/download/@babel/runtime-7.4.4.tgz#dc2e34982eb236803aa27a07fea6857af1b9171d"
-  integrity sha1-3C40mC6yNoA6onoH/qaFevG5Fx0=
+  version "7.4.5"
+  resolved "http://r.cnpmjs.org/@babel/runtime/download/@babel/runtime-7.4.5.tgz#582bb531f5f9dc67d2fcb682979894f75e253f12"
+  integrity sha1-WCu1MfX53GfS/LaCl5iU914lPxI=
   dependencies:
     regenerator-runtime "^0.13.2"
 
@@ -2098,7 +2098,7 @@ boom@2.x.x:
 
 bootstrap@^4.3.1:
   version "4.3.1"
-  resolved "http://src.devops.bitech.cn:86/repository/RECO.NPM/bootstrap/-/bootstrap-4.3.1.tgz#280ca8f610504d99d7b6b4bfc4b68cec601704ac"
+  resolved "http://r.cnpmjs.org/bootstrap/download/bootstrap-4.3.1.tgz#280ca8f610504d99d7b6b4bfc4b68cec601704ac"
   integrity sha1-KAyo9hBQTZnXtrS/xLaM7GAXBKw=
 
 boxen@^1.2.1:

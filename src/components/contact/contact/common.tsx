@@ -61,6 +61,7 @@ export function SortContactsInfo({ item, i }) {
             : item.Type === '2' ? '维修人员' : '普通用户';
 
     return <List.Item
+        key={i}
         thumb={<div style={pinYinAvatarStyle} >{item.firstLetter}</div>}
         extra={<Badge key={i} text={badge} style={contactBadgeStyle} />}
         multipleLine={true}

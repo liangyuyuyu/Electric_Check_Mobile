@@ -9,7 +9,6 @@ export const PylonIconType = [
     "pylon_repairing",
     "pylon_danger1",
     "pylon_danger2",
-    "pylon_danger3",
-    "pylon_danger4"
+    "pylon_danger3"
 ]
 
