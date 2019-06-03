@@ -16,6 +16,8 @@ import { api_url } from "../../../functions/index";
 
 import { getFormatDate } from "../../task/task/index";
 
+import { phoneNumberCheck } from "../../login/login/index";
+
 import { PylonIconType } from "../models/index";
 
 import {
@@ -41,30 +43,44 @@ export class HomeComponent extends Component {
   pylonsAllMarker: any = []; // 保存电塔的所有marker,方便从地图上移出
   pylonsAllCircle: any = []; // 保存电塔的所有marker,方便从地图上移出
 
+  startNavi = ""; // 验证是否是从别的界面跳到该界面，直接执行路线规划
+
   componentDidMount() {
-    !stateLogin!.get("currentUser") ? goTo("login") : dispatch({ type: "home/getPylons" });
-    this.renderMap();
+    if (!stateLogin!.get("currentUser")) {
+      goTo("/login/home")
+    } else {
+      this.startNavi = matchParams.startNavi;
+
+      this.getData();
+      this.renderMap();
+    }
     // console.log(window.location.href, NProgress);
     // NProgress.done(); // 页面加载进度条结束
   }
 
+  getData() {
+    if (this.startNavi === "0") { // 普通跳转
+      dispatch({ type: "home/getPylons" });
+    } else if (this.startNavi.indexOf("toPylon:") > -1) { // 表示从任务详情页面点击去往任务点按钮跳转到该界面的
+      dispatch({ type: "home/getOnePylon", data: { id: this.startNavi.split(":")[1] } });
+    }
+  }
+
   componentWillUnmount() {
-    dispatch({
-      type: "home/changeState",
-      data: {
-        isRenderMapOnClick: 0,
-        isShowNavigationChoice: false
-      }
-    });
+    dispatch({ type: "home/init" });
 
     Toast.hide(); // 全局配置和全局销毁Toast的方法
   }
 
   renderTitle(title: any, showLoading: boolean) {
+    const isStartNavi = this.startNavi.indexOf("toPylon:");
+
     return <NavBar
       mode="dark"
-      leftContent={<Icon key="1" type="ellipsis" />}
-      onLeftClick={() => dispatch({ type: "home/changeState", data: { isShowSideBar: true } })}
+      leftContent={isStartNavi > -1 ? <Icon key="1" type="cross-circle" /> : <Icon key="1" type="ellipsis" />}
+      onLeftClick={() => {
+        isStartNavi > -1 ? goTo("/task") : dispatch({ type: "home/changeState", data: { isShowSideBar: true } });
+      }}
       rightContent={<img src={`${api_url}/Assert/home/refresh.png`} width='22px' height='22px' onClick={() => location.reload()} />}
       style={{ height: "7%", fontSize: "15" }}
     >
@@ -296,7 +312,7 @@ export class HomeComponent extends Component {
           this.renderMapPylonsMarker(pylons.data)
           : this.renderMapPylonsMarker(pylonsType[currentMapShowMarkerType]));
       }} // 点击 x 或 mask 回调 (): void
-      style={{ maxHeight: "70%", overflowY: "auto", overflowX: "hidden" }}
+      style={{ maxHeight: "100%" }}
     >
       <List>
         {keyArray.map((item: any, index: number) => (
@@ -327,11 +343,14 @@ export class HomeComponent extends Component {
       keyArray: any = [];
 
     let distance = "",
+      picturesArray: any,
       pylonInfo: any;
     if (currentOnClickPylonIndex >= 0) {
       pylonInfo = currentMapShowMarkerType === "all" ? pylons.data[currentOnClickPylonIndex] : pylonsType[currentMapShowMarkerType][currentOnClickPylonIndex];
 
       distance = (AMap.GeometryUtil.distance([currentLng, currentLat], [pylonInfo.Lng, pylonInfo.Lat]) / 1000).toFixed(2); // 计算地面距离，单位：米
+
+      picturesArray = pylonInfo.Pictures ? pylonInfo.Pictures.split(",") : ["el1.png", "el2.png", "el3.png"];
 
       keyArray.push("当前状态:");
       valueArray.push(pylonStatusBadge(pylonInfo.State));
@@ -411,19 +430,17 @@ export class HomeComponent extends Component {
       style={{ height: "100%" }}
     >
       <List>
-        <List.Item wrap={true} key={"picture"}>
-          <Carousel
-            autoplay={true} // 是否自动切换
-            infinite // 是否循环播放
-            cellSpacing={15} // 项目之间的间距，以px为单位
-            beforeChange={(from, to) => console.log(`slide from ${from} to ${to}`)}
-            afterChange={index => console.log('slide to', index)}
-          >
-            <img src={`${api_url}/Assert/home/pylonInfoPic/el1.png`} style={{ width: "100%", height: "220px" }} />
-            <img src={`${api_url}/Assert/home/pylonInfoPic/el2.png`} style={{ width: "100%", height: "220px" }} />
-            <img src={`${api_url}/Assert/home/pylonInfoPic/el3.png`} style={{ width: "100%", height: "220px" }} />
-          </Carousel>
-        </List.Item>
+        {picturesArray && <List.Item wrap={true} key={"picture"}>
+          {picturesArray.length > 1 ?
+            <Carousel
+              autoplay={true} // 是否自动切换
+              infinite // 是否循环播放
+              cellSpacing={15} // 项目之间的间距，以px为单位
+            >
+              {picturesArray.map(pic => <img src={`${api_url}/upload/pylon/${pic}`} style={{ width: "100%", height: "220px" }} />)}
+            </Carousel>
+            : <img src={`${api_url}/upload/pylon/${picturesArray[0]}`} style={{ width: "100%", height: "220px" }} />}
+        </List.Item>}
         {keyArray.map((item: any, index: number) => (
           <List.Item wrap={true} key={index}>
             <table style={{ width: "100%" }}>
@@ -707,6 +724,8 @@ export class HomeComponent extends Component {
   // 渲染地图定位
   renderMapDW() {
     this.map.plugin('AMap.Geolocation', () => {
+      const isStartNavi = this.startNavi.indexOf("toPylon:");
+
       let geolocation = new AMap.Geolocation({
         enableHighAccuracy: true, // 是否使用高精度定位，默认:true
         GeoLocationFirst: true, // 默认为false，设置为true的时候可以调整PC端为优先使用浏览器定位，失败后使用IP定位
@@ -724,7 +743,7 @@ export class HomeComponent extends Component {
           // 'animation': 'AMAP_ANIMATION_BOUNCE', // 点标记的动画效果, AMAP_ANIMATION_NONE:无动画效果，AMAP_ANIMATION_DROP:点标掉落效果，AMAP_ANIMATION_BOUNCE:点标弹跳效果 
           'autoRotation': true // 是否自动旋转。点标记在使用moveAlong动画时，路径方向若有变化，点标记是否自动调整角度，默认为false。广泛用于自动调节车辆行驶方向。
         },
-        // showCircle: false,        // 定位成功后用圆圈表示定位精度范围，默认：true
+        showCircle: false,        // 定位成功后用圆圈表示定位精度范围，默认：true
         // circleOptions: { // 定位点Circle的配置，不设置该属性则使用默认Circle样式
         //   radius: 20, // 圆半径
         //   fillColor: '#1791fc',   // 圆形填充颜色
@@ -742,29 +761,36 @@ export class HomeComponent extends Component {
         useNative: true, // 是否使用安卓定位sdk用来进行定位，默认：false, 适用于同时在APP中使用安卓定位sdk并在APP WebView中使用了JSAPI的开发者。开启后，将优先尝试使用sdk进行定位，失败后依次尝试浏览器定位和IP定位。
         extensions: "all" // extensions用来设定是否需要周边POI、道路交叉口等信息，可选值'base'、'all',默认为'base',只返回地址信息
       });
+
       this.map.addControl(geolocation);
       geolocation.getCurrentPosition();
-      AMap.event.addListener(geolocation, 'complete', onComplete); // 返回定位信息
-      AMap.event.addListener(geolocation, 'error', onError);      // 返回定位出错信息
 
-      function onComplete(data: any) {
-        Toast.success(`当前位置:${data.formattedAddress}`, 1)
-        // data是具体的定位信息
-        // console.log(data)
-        dispatch({
-          type: "home/changeState",
-          data: {
-            currentAddress: data.formattedAddress,
-            currentLng: data.position.lng,
-            currentLat: data.position.lat
-          }
-        })
-      }
+      AMap.event.addListener(geolocation, 'complete', (data: any) => {  // 定位成功
+        if (isStartNavi > -1) {
+          dispatch({
+            type: "home/changeState", data: {
+              currentAddress: data.formattedAddress,
+              currentLng: data.position.lng,
+              currentLat: data.position.lat,
+              isShowNavigationChoice: true,
+              isRenderMapOnClick: 2
+            }
+          });
+        } else {
+          dispatch({
+            type: "home/changeState", data: {
+              currentAddress: data.formattedAddress,
+              currentLng: data.position.lng,
+              currentLat: data.position.lat
+            }
+          });
+          Toast.success(`当前位置:${data.formattedAddress}`, 1);
+        }
+      });
 
-      function onError(data: any) {
-        // 定位出错
-        Toast.fail(`定位失败`, 1)
-      }
+      AMap.event.addListener(geolocation, 'error', (data: any) => {// 定位出错
+        Toast.fail(`定位失败`, 1);
+      });
     })
   }
 
@@ -930,6 +956,7 @@ export class HomeComponent extends Component {
   removeNavigation() {
     this.mapOnClickMarker && this.map.remove(this.mapOnClickMarker); // 删除点击地图展示的marker
 
+    console.log(this.walkingNavigation, this.ridingNavigation, this.transferNavigation, this.drivingNavigation)
     this.walkingNavigation && this.walkingNavigation.clear!(); // 清除规划的路线，clear()函数清除上一次结果，可以清除地图上绘制的路线以及路径文本结果
     this.ridingNavigation && this.ridingNavigation.clear!(); // 清除规划的路线，clear()函数清除上一次结果，可以清除地图上绘制的路线以及路径文本结果
     this.transferNavigation && this.transferNavigation.clear!(); // 清除规划的路线，clear()函数清除上一次结果，可以清除地图上绘制的路线以及路径文本结果
@@ -972,6 +999,7 @@ export class HomeComponent extends Component {
       {pylons && this.renderPylonDevicesModal()}
       {pylons && this.renderAssignmentsModal()}
       {pylons && this.renderChoicePylonsSideBar()}
+      {this.renderAddWorkerModal()}
     </Drawer>
   }
 
@@ -1641,51 +1669,154 @@ export class HomeComponent extends Component {
             <List>
               <List.Item onClick={() => dispatch({ type: "home/changeState", data: { isRenderAddPylonModal: true } })}>
                 添加电塔
-            </List.Item>
+              </List.Item>
+              <List.Item onClick={() => dispatch({ type: "home/changeState", data: { isRenderAddWorkerModal: true } })}>
+                添加员工
+              </List.Item>
             </List>
           </>
         }
-        {currentUser.Type === "1" && pylonsType &&
-          <Accordion>
-            <Accordion.Panel header={<div style={{ fontSize: "15px" }}>巡检任务</div>}>
-              <Alert key={2} variant="success">
-                <List>
-                  <List.Item onClick={() => console.log("完成巡检任务1")}>
-                    巡检任务1
-                  </List.Item>
-                  <List.Item onClick={() => console.log("完成巡检任务2")}>
-                    巡检任务2
-                  </List.Item>
-                  <List.Item onClick={() => console.log("完成巡检任务2")}>
-                    巡检任务3
-                  </List.Item>
-                </List>
-              </Alert>
-            </Accordion.Panel>
-          </Accordion>
-        }
-        {currentUser.Type === "2" && pylonsType &&
-          <Accordion>
-            <Accordion.Panel header={<div style={{ fontSize: "15px" }}>维修任务</div>}>
-              <Alert key={3} variant="danger">
-                <List>
-                  <List.Item onClick={() => console.log("完成维修任务1")}>
-                    维修任务1
-                  </List.Item>
-                  <List.Item onClick={() => console.log("完成维修任务2")}>
-                    维修任务2
-                  </List.Item>
-                  <List.Item onClick={() => console.log("完成维修任务2")}>
-                    维修任务3
-                  </List.Item>
-                </List>
-              </Alert>
-            </Accordion.Panel>
-          </Accordion>
-        }
+        <List>
+          <List.Item onClick={() => goTo("/task")}>
+            查看任务
+          </List.Item>
+        </List>
       </div>
     </div>
   }
+
+  // 渲染添加电塔的表单
+  renderAddWorkerModal() {
+    const currentUser = stateLogin!.get("currentUser");
+
+    return <Modal
+      popup // 是否弹窗模式
+      visible={state!.get("isRenderAddWorkerModal")} // 对话框是否可见
+      // closable={true} // 是否显示关闭按钮
+      maskClosable={true} // 点击蒙层是否允许关闭
+      animationType="slide-up" // 可选: 'slide-down / up' / 'fade' / 'slide'
+      title={<div style={{ height: "100%", backgroundColor: "#108ee9", color: "#ffffff" }}>添加员工表单</div>} // 标题 React.Element
+      footer={[
+        {
+          text: <div>取消</div>,
+          onPress: () => {
+            dispatch({
+              type: "home/changeState",
+              data: {
+                isRenderAddWorkerModal: false,
+                workerPhone: "",
+                workerName: "",
+                workerAge: "",
+                workerType: "",
+                workerSex: "0",
+                workerAddress: "",
+              }
+            })
+          }
+        },
+        {
+          text: <div style={{ backgroundColor: "#108ee9", color: "#ffffff" }}>提交</div>,
+          onPress: this.addWorkerCheckData.bind(this)
+        }
+      ]} // 底部内容  Array {text, onPress}
+      style={{ height: "100%" }}
+      onClose={() => dispatch({ type: "home/changeState", data: { isRenderAddWorkerModal: false } })}
+    >
+      <Form style={{ padding: "15px", textAlign: "left" }}>
+        <Form.Group controlId="workerPhone">
+          <Form.Label style={{ color: "black" }}>员工手机号：</Form.Label>
+          <Form.Control style={{ fontSize: "15px" }} type="text" placeholder="请输入员工手机号(必填)"
+            onChange={e => dispatch({ type: "home/changeState", data: { workerPhone: e.target.value } })} />
+          <Form.Text className="text-muted">请填写11位数的手机号</Form.Text>
+        </Form.Group>
+        <Form.Group controlId="workerName">
+          <Form.Label style={{ color: "black" }}>员工姓名：</Form.Label>
+          <Form.Control style={{ fontSize: "15px" }} type="text" placeholder="请输入员工姓名(必填)"
+            onChange={e => dispatch({ type: "home/changeState", data: { workerName: e.target.value } })} />
+        </Form.Group>
+        <Form.Group controlId="workerAge">
+          <Form.Label style={{ color: "black" }}>员工年龄：</Form.Label>
+          <Form.Control style={{ fontSize: "15px" }} type="number" placeholder="请输入员工年龄(必填)"
+            onChange={e => dispatch({ type: "home/changeState", data: { workerAge: e.target.value } })} />
+          <Form.Text className="text-muted">此项只能输入整数</Form.Text>
+        </Form.Group>
+        <Form.Group controlId="workerType">
+          <Form.Label style={{ color: "black" }}>员工类型：</Form.Label>
+          <Form.Control style={{ fontSize: "15px" }} as="select"
+            onChange={e => dispatch({ type: "home/changeState", data: { workerType: e.target.value } })}>
+            <option style={{ display: "none" }}>请选择员工类型(必选)</option>
+            <option value={0}>管理员</option>
+            <option value={1}>巡检人员</option>
+            <option value={2}>维修人员</option>
+            <option value={3}>普通用户</option>
+          </Form.Control>
+        </Form.Group>
+        <Form.Group controlId="workerSex">
+          <Form.Label style={{ color: "black" }}>员工性别：</Form.Label>
+          <Form.Control style={{ fontSize: "15px" }} as="select"
+            onChange={e => dispatch({ type: "home/changeState", data: { workerSex: e.target.value } })}>
+            <option value={0}>男</option>
+            <option value={1}>女</option>
+          </Form.Control>
+        </Form.Group>
+        <Form.Group controlId="workerAddress">
+          <Form.Label style={{ color: "black" }}>员工住址：</Form.Label>
+          <Form.Control style={{ fontSize: "15px" }} type="text" placeholder="请输入员工住址"
+            onChange={e => dispatch({ type: "home/changeState", data: { workerAddress: e.target.value } })} />
+          <Form.Text className="text-muted">请输入详细地址</Form.Text>
+        </Form.Group>
+        <Form.Group controlId="releasePersonName" >
+          <Form.Label style={{ color: "black" }}>员工添加者姓名：</Form.Label>
+          <Form.Control style={{ fontSize: "15px" }} value={currentUser && currentUser.Name || ""} disabled />
+        </Form.Group>
+        <Form.Group controlId="releasePersonPhone" >
+          <Form.Label style={{ color: "black" }}>员工添加者手机号：</Form.Label>
+          <Form.Control style={{ fontSize: "15px" }} value={currentUser && currentUser.Account || ""} disabled />
+        </Form.Group>
+      </Form>
+    </Modal>
+  }
+
+  // 点击添加员工时，验证数据是否填写完成
+  addWorkerCheckData() {
+    const workerPhone = state!.get("workerPhone");
+    if (!workerPhone) return this.checkFailToast("员工手机号");
+    else if (!workerPhone.match(phoneNumberCheck)) {
+      Toast.fail("请输入正确的手机号！", 1);
+      return;
+    }
+    else if (!state!.get("workerName")) return this.checkFailToast("员工姓名");
+    else if (!state!.get("workerAge")) return this.checkFailToast("员工年龄");
+    else if (!state!.get("workerType")) return this.checkFailToast("员工类型");
+
+    Toast.loading("提交中...");
+    dispatch({
+      type: "home/addWorker",
+      callback: (state: number, msg?: any) => {
+        Toast.hide();
+        if (state === 1) { // 提交成功
+          Toast.success("表单提交成功！", 1);
+          dispatch({
+            type: "home/changeState", data: {
+              isRenderAddWorkerModal: false,
+              workerPhone: "",
+              workerName: "",
+              workerAge: "",
+              workerType: "",
+              workerSex: "0",
+              workerAddress: "",
+            }
+          });
+        } else if (state === 2) { // 账号已存在于数据库
+          Toast.offline("该手机号已被注册,请核实！", 2);
+        } else if (state === 0) { // 提交失败
+          console.log(msg);
+          Toast.offline("表单提交失败,请重试！", 1);
+        }
+      }
+    })
+  }
+
 
   // 地图的输入提示插件
   renderMapAutoComplete() {
@@ -1842,6 +1973,7 @@ let state: any;
 let stateLogin: any;
 let goBack: any;
 let goTo: any;
+let matchParams: any;
 let isLoading: any; // 是否正在加载
 
 // export const HomePage = connect(mapStateToProps)(HomeComponent);
@@ -1852,6 +1984,7 @@ export const HomePage = connect(mapStateToProps)((props: any) => {
   stateLogin = props.login;
   goBack = props.history.goBack;
   goTo = props.history.push;
+  matchParams = props.match.params;
   isLoading = props.loading.global;
   // console.log(props) // props中有match、location、home(命名空间)、history(goBack、push、go...)、dispatch
   return <HomeComponent />

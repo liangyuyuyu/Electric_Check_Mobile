@@ -9,6 +9,7 @@ import { TasksTypeBadge, TasksTypeBadgeColor } from "../models/index"
 export const tabs = [
     { title: <Badge>未开始</Badge> },
     { title: <Badge>进行中</Badge> },
+    { title: <Badge>未报告</Badge> },
     { title: <Badge>已完成</Badge> },
     { title: <Badge>退回中</Badge> },
     { title: <Badge>已超时</Badge> }

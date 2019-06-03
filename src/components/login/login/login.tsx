@@ -145,7 +145,7 @@ export class LoginComponent extends Component {
       callback: (state: number, msg?: any) => {
         Toast.hide();
         if (state === 1) { // 登录成功
-          Toast.success("登录成功！", 1, () => goBack());
+          Toast.success("登录成功！", 1, () => goTo(`/${matchParams.backPath}`));
         } else if (state === 2) { // 登录失败
           Toast.offline("账号有误，若有问题请联系管理员", 1);
         } else if (state === 3) { // 登录失败
@@ -163,6 +163,7 @@ let dispatch: any;
 let state: any;
 let goBack: any;
 let goTo: any;
+let matchParams: any;
 let isLoading: any; // 是否正在加载
 
 function mapStateToProps(state: any) {// 获取state
@@ -176,7 +177,8 @@ export const LoginPage = connect(mapStateToProps)((props: any) => {
   state = props.login;
   goBack = props.history.goBack;
   goTo = props.history.push;
+  matchParams = props.match.params;
   isLoading = props.loading.global;
-
+  // console.log(props)
   return <LoginComponent />
 });

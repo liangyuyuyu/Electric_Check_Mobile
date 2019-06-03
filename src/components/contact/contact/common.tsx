@@ -57,8 +57,8 @@ export function ContactsItemInfo({ item, i, avatar, badge }) {
 // 按照联系人姓名首字母排序展示
 export function SortContactsInfo({ item, i }) {
     const badge = item.Type === '0' ? '管理员'
-        : item.Type === '1' ? '巡检人员'
-            : item.Type === '2' ? '维修人员' : '普通用户';
+        : item.Type === '1' ? '巡检员'
+            : item.Type === '2' ? '维修员' : '用户';
 
     return <List.Item
         key={i}

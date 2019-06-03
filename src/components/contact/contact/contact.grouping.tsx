@@ -35,7 +35,7 @@ export class ContactGroupingComponent extends Component {
       repairers = state!.get("repairers") || [],
       users = state!.get("users") || [];
 
-    return <div style={{ width: "100%", height: "100%" }}>
+    return <div style={{ position: 'fixed', width: "100%", height: "100%" }}>
       {this.renderTitle()}
       <div style={{ width: "100%", height: "93%", overflowY: "auto", overflowX: "hidden" }}>
         <Accordion defaultActiveKey="0">

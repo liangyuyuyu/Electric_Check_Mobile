@@ -103,7 +103,7 @@ export function HomeMap(goTo: any) {
             background: `url(${api_url}/Assert/home/home2.png) center center /  21px 21px no-repeat`
         }} />}
         // badge={'new'}
-        onPress={() => goTo("home")}
+        onPress={() => goTo("/home/0")}
     >
     </TabBar.Item>
 }
@@ -111,7 +111,7 @@ export function HomeMap(goTo: any) {
 export function Tasks(goTo: any) {
     return <TabBar.Item
         title="任务"
-        key="home"
+        key="task"
         icon={<div style={{
             width: '22px',
             height: '22px',
@@ -123,7 +123,7 @@ export function Tasks(goTo: any) {
             background: `url(${api_url}/Assert/task/task2.png) center center /  21px 21px no-repeat`
         }} />}
         badge={1}
-        onPress={() => goTo('task')}
+        onPress={() => goTo('/task')}
     >
     </TabBar.Item>
 }
@@ -131,7 +131,7 @@ export function Tasks(goTo: any) {
 export function Contacts(goTo: any) {
     return <TabBar.Item
         title="联系人"
-        key="home"
+        key="contact"
         icon={<div style={{
             width: '22px',
             height: '22px',
@@ -143,7 +143,7 @@ export function Contacts(goTo: any) {
             background: `url(${api_url}/Assert/contact/contact2.png) center center /  21px 21px no-repeat`
         }} />}
         badge={1}
-        onPress={() => goTo('contact')}
+        onPress={() => goTo('/contact')}
     >
     </TabBar.Item >
 }
@@ -151,7 +151,7 @@ export function Contacts(goTo: any) {
 export function My(goTo: any) {
     return <TabBar.Item
         title="我的"
-        key="home"
+        key="my"
         icon={<div style={{
             width: '22px',
             height: '22px',
@@ -163,7 +163,7 @@ export function My(goTo: any) {
             background: `url(${api_url}/Assert/my/my2.png) center center /  21px 21px no-repeat`
         }} />}
         badge={"new"}
-        onPress={() => goTo('my')}
+        onPress={() => goTo('/my')}
     >
     </TabBar.Item>
 }

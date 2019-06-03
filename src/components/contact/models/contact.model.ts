@@ -6,6 +6,8 @@ import { app } from "../../../functions/index";
 
 import { UsersGetService } from "../service/index";
 
+import { Namespaces as LoginNamespaces } from "../../login/models/index";
+
 import { Namespaces, contactsBubbleSort } from "./common";
 
 app.model({
@@ -25,7 +27,7 @@ app.model({
   effects: {
 
     // 获取所有的联系人
-    *getContacts({ fail }, { call, put }) {
+    *getContacts({ fail }, { call, select, put }) {
       try {
         yield put({ type: "changeState", data: { showLoading: true } });
 

@@ -5,6 +5,7 @@ import { loginRoutes } from "./components/login/login/index";
 import { homeRoutes } from "./components/home/home/index";
 import { contactRoutes } from "./components/contact/contact/index";
 import { taskRoutes } from "./components/task/task/index";
+import { myRoutes } from "./components/my/my/index";
 
 function RouterConfig({ history }) {
   return (
@@ -14,7 +15,8 @@ function RouterConfig({ history }) {
         {homeRoutes()}
         {taskRoutes()}
         {contactRoutes()}
-        <Redirect to="/home" />
+        {myRoutes()}
+        <Redirect to="/my" />
       </Switch>
     </Router>
   );

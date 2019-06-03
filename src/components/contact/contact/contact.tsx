@@ -17,7 +17,7 @@ export class ContactComponent extends Component {
   }
 
   componentDidMount() {
-    dispatch({ type: "contact/getContacts" });
+    !stateLogin!.get("currentUser") ? goTo("/login/contact") : dispatch({ type: "contact/getContacts" });
   }
 
   renderTitle() {
@@ -99,12 +99,14 @@ export class ContactComponent extends Component {
 function mapStateToProps(state: any) {// 获取state
   // console.log(state) // state中有所有命名空间的数据
   let contact = state.contact;
+  let login = state.login;
   let loading = state.loading;
-  return { contact, loading };
+  return { contact, login, loading };
 }
 
 let dispatch: any;
 let state: any;
+let stateLogin: any;
 let goBack: any;
 let goTo: any;
 let isLoading: any; // 是否正在加载
@@ -114,6 +116,7 @@ let isLoading: any; // 是否正在加载
 export const ContactPage = connect(mapStateToProps)((props: any) => {
   dispatch = props.dispatch;
   state = props.contact;
+  stateLogin = props.login;
   goBack = props.history.goBack;
   goTo = props.history.push;
   isLoading = props.loading.global;

@@ -9,7 +9,7 @@ export * from './common'
 export function homeRoutes() {
     return (
         <Route
-            path={`/home`}
+            path={`/home/:startNavi`}
             render={({ match }) => (
                 <>
                     <Route path={match.path} component={HomePage} />
