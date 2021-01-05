@@ -9,7 +9,7 @@
   "dependencies": {
     "@babel/runtime": "^7.4.3",
     "antd-mobile": "^2.2.8",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "babel-plugin-import": "^1.11.0",
     "bootstrap": "^4.3.1",
     "dva": "^2.4.1",
